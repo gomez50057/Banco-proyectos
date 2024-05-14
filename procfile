@@ -1,6 +1,5 @@
 web: gunicorn django_project.wsgi
 
-
 asgiref==3.7.2
 cffi==1.16.0
 charset-normalizer==3.3.2
