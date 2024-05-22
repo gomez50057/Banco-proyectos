@@ -10,6 +10,11 @@ from .models import ProyectoDependencia
 from .serializers import UserSerializer
 
 
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
 
 
 @api_view(['POST'])
@@ -38,14 +43,16 @@ def registro_usuario(request):
 
 @api_view(['POST'])
 def inicio_sesion(request):
-    """
-    Inicia sesión con el nombre de usuario proporcionado.
-    """
     username = request.data.get('username')
-
-    if User.objects.filter(username=username).exists():
+    password = request.data.get('password')
+    
+    user = authenticate(request, username=username, password=password)
+    
+    if user is not None:
+        # Si la autenticación es exitosa, devolver un mensaje de éxito
         return Response({"mensaje": "Inicio de sesión exitoso"}, status=status.HTTP_200_OK)
     else:
+        # Si la autenticación falla, devolver un error
         return Response({"error": "Credenciales inválidas"}, status=status.HTTP_400_BAD_REQUEST)
 
 
