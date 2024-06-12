@@ -1,4 +1,9 @@
-from django.contrib import admin
-from .models import ProyectoDependencia
+# admin.py
 
-admin.site.register(ProyectoDependencia)
+from django.contrib import admin
+# from .models import ProyectoDependencia
+from .models import Project
+
+
+# admin.site.register(ProyectoDependencia)
+admin.site.register(Project)

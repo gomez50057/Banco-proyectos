@@ -1,16 +1,15 @@
+# serializers.py
+
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Perfil
-from .models import ProyectoDependencia
-
+from .models import Perfil, ProyectoDependencia, Project
 
 class UsuarioSerializer(serializers.ModelSerializer):
-    tipo_cuenta = serializers.CharField()  # Agrega el campo tipo_cuenta
+    tipo_cuenta = serializers.CharField()
 
     class Meta:
         model = User
         fields = ['id', 'username', 'password', 'tipo_cuenta']
-
 
 class PerfilSerializer(serializers.ModelSerializer):
     usuario = UsuarioSerializer()
@@ -19,20 +18,17 @@ class PerfilSerializer(serializers.ModelSerializer):
         model = Perfil
         fields = ['id', 'usuario', 'tipo_cuenta']
 
-
-
 class UserSerializer(serializers.ModelSerializer):
-    """
-    Serializador para el modelo User.
-    """
     class Meta:
         model = User
-        fields = ['id', 'username', ]
-
+        fields = ['id', 'username']
 
 class ProyectoDependenciaSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProyectoDependencia
         fields = ['projectName', 'description', 'file']
 
-
+class ProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Project
+        fields = '__all__'

@@ -1,20 +1,16 @@
-from django.contrib.auth.models import User
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from .serializers import UsuarioSerializer
+# views.py
 
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
 from django.shortcuts import render
 from django.http import JsonResponse
-from .models import ProyectoDependencia 
-from .serializers import UserSerializer
 
-
-from django.contrib.auth import authenticate
-from django.contrib.auth.models import User
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import status
+
+from .models import ProyectoDependencia, Project
+from .serializers import UsuarioSerializer, UserSerializer, ProyectoDependenciaSerializer, ProjectSerializer
 
 
 @api_view(['POST'])
@@ -29,15 +25,16 @@ def registro_usuario(request):
 
         if User.objects.filter(username=username).exists():
             return Response({"error": "El nombre de usuario ya está en uso"}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            usuario = User.objects.create_user(
-                username=username,
-                password=serializer.validated_data.get('password'),
-            )
-            usuario.perfil.tipo_cuenta = tipo_cuenta
-            usuario.save()
+        
+        usuario = User.objects.create_user(
+            username=username,
+            password=serializer.validated_data.get('password'),
+        )
+        usuario.perfil.tipo_cuenta = tipo_cuenta
+        usuario.save()
 
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -61,24 +58,16 @@ def ver_usuarios_registrados(request):
     """
     Vista para ver todos los usuarios registrados en la base de datos.
     """
-    # Obtener todos los usuarios registrados
     usuarios = User.objects.all()
-    # Serializar los usuarios
     serializer = UserSerializer(usuarios, many=True)
-    # Devolver la lista de usuarios serializados como una respuesta JSON
     return Response(serializer.data)
 
 
-# Guardado del proyecto formulario 
-
-
-from django.http import JsonResponse
-from rest_framework.decorators import api_view
-from .models import ProyectoDependencia 
-from .serializers import ProyectoDependenciaSerializer
-
 @api_view(['POST'])
 def guardar_proyecto(request):
+    """
+    Guarda un nuevo proyecto de dependencia.
+    """
     if request.method == 'POST':
         projectName = request.data.get('projectName')
         description = request.data.get('description')
@@ -92,41 +81,51 @@ def guardar_proyecto(request):
             )
             serializer = ProyectoDependenciaSerializer(proyecto)
             return JsonResponse(serializer.data, status=201)
-
         except Exception as e:
             print(f"Error al guardar el proyecto: {e}")
             return JsonResponse({'error': 'Ocurrió un error al guardar el proyecto'}, status=500)
-
     else:
         return JsonResponse({'error': 'Método no permitido'}, status=405)
 
+
 @api_view(['GET'])
 def ver_proyectos_registrados(request):
+    """
+    Vista para ver todos los proyectos registrados.
+    """
     proyectos = ProyectoDependencia.objects.all()
     serializer = ProyectoDependenciaSerializer(proyectos, many=True)
     return JsonResponse(serializer.data, safe=False)
 
 
-from django.http import JsonResponse
-from .models import ProyectoDependencia
-from .serializers import ProyectoDependenciaSerializer
-
-
-
-
-
+@api_view(['GET'])
 def ver_proyectos_en_tabla(request):
+    """
+    Vista para ver todos los proyectos en formato de tabla.
+    """
     proyectos = ProyectoDependencia.objects.all()
     serializer = ProyectoDependenciaSerializer(proyectos, many=True)
     data = serializer.data
 
-    # Formatear los datos de la tabla
-    table_data = []
-    for proyecto in data:
-        table_data.append({
+    table_data = [
+        {
             'Project Name': proyecto.get('projectName'),
             'Description': proyecto.get('description'),
             'File': proyecto.get('file')
-        })
+        }
+        for proyecto in data
+    ]
 
     return JsonResponse(table_data, safe=False)
+
+
+@api_view(['POST'])
+def create_project(request):
+    """
+    Crea un nuevo proyecto.
+    """
+    serializer = ProjectSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
