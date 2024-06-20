@@ -1,5 +1,3 @@
-# En models.py
-
 from django.db import models
 
 class FormProject(models.Model):
@@ -10,7 +8,7 @@ class FormProject(models.Model):
     tipo_entidad = models.CharField(max_length=255)
     dependencia = models.CharField(max_length=255, null=True, blank=True)
     organismo = models.CharField(max_length=255, null=True, blank=True)
-    municipio = models.CharField(max_length=255, null=True, blank=True)
+    municipioEnd = models.CharField(max_length=255, null=True, blank=True)
     peticion_personal = models.CharField(max_length=255, null=True, blank=True)
     unidad_responsable = models.CharField(max_length=255)
     unidad_presupuestal = models.CharField(max_length=255)
@@ -29,6 +27,7 @@ class FormProject(models.Model):
     beneficiarios = models.IntegerField(null=True, blank=True)
     alineacion_normativa = models.TextField()
     region = models.CharField(max_length=255)
+    municipio = models.CharField(max_length=255)
     municipio_impacto = models.JSONField()
     localidad = models.CharField(max_length=255)
     barrio_colonia_ejido = models.CharField(max_length=255)
@@ -41,6 +40,8 @@ class FormProject(models.Model):
     plan_sectorial = models.CharField(max_length=255)
     indicadores_estrategicos = models.CharField(max_length=255)
     indicadores_tacticos = models.CharField(max_length=255, null=True, blank=True)
+    indicadores_desempeno = models.CharField(max_length=255, null=True, blank=True)
+    indicadores_rentabilidad = models.CharField(max_length=255, null=True, blank=True)
     estado_inicial = models.ImageField(upload_to='estado_inicial/', null=True, blank=True)
     estado_con_proyecto = models.ImageField(upload_to='estado_con_proyecto/', null=True, blank=True)
     estudios_prospectivos = models.FileField(upload_to='estudios_prospectivos/', null=True, blank=True)
