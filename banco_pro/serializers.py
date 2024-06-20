@@ -25,3 +25,12 @@ class FormProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = FormProject
         fields = '__all__'  # Incluye todos los campos del modelo
+
+
+from rest_framework import serializers
+from .models import FormProject
+
+class FormProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FormProject
+        fields = '__all__'

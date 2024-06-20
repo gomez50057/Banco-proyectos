@@ -54,3 +54,30 @@ def create_project(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+from django.http import JsonResponse
+from .models import FormProject
+
+def ver_proyectos_tabla(request):
+    proyectos = FormProject.objects.values('project_name', 'descripcion', 'tipo_proyecto', 'municipio', 'beneficiarios')
+    return JsonResponse(list(proyectos), safe=False)
+
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .models import FormProject
+from .serializers import FormProjectSerializer
+
+class BulkCreateProjects(APIView):
+    def post(self, request, *args, **kwargs):
+        if not isinstance(request.data, list):
+            return Response({"error": "Se esperaba una lista de objetos"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        serializer = FormProjectSerializer(data=request.data, many=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+

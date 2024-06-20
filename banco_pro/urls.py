@@ -6,6 +6,7 @@ from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
 
+from .views import BulkCreateProjects
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -21,6 +22,8 @@ urlpatterns = [
     path('guardar-proyecto/', views.create_project, name='create_project'),
     path('login/', auth_views.LoginView.as_view(template_name='LoginLayout'), name='login'),
 
+    path('ver-proyectos-tabla/', views.ver_proyectos_tabla, name='ver_proyectos_tabla'),
+    path('masivacarga/', BulkCreateProjects.as_view(), name='bulk-create-projects'),
 
 
     # path('ver-proyectos-registrados/', views.ver_proyectos_registrados, name='ver_proyectos_registrados'),
