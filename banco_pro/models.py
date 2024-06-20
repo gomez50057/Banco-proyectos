@@ -1,69 +1,61 @@
 # En models.py
 
-from django.contrib.auth.models import User
 from django.db import models
 
-class Perfil(models.Model):
-    usuario = models.OneToOneField(User, on_delete=models.CASCADE)
-    tipo_cuenta = models.CharField(max_length=20, choices=[("ciudadano", "Ciudadano"), ("dependencia", "Dependencia"), ("municipio", "Municipio")])
-
-    class Meta:
-        app_label = 'banco_pro'  # Agrega esta línea para especificar la aplicación
-
-    def __str__(self):
-        return self.usuario.username
-
-
-class ProyectoDependencia(models.Model):
-    projectName = models.CharField(max_length=100)
-    description = models.TextField()
-    file = models.FileField(upload_to='uploads/')  # Donde 'uploads/' es la carpeta donde se guardarán los archivos
-
-    def __str__(self):
-        return self.projectName
-    
-
-
-from django.db import models
-
-class Project(models.Model):
+class FormProject(models.Model):
+    fecha_registro = models.DateField(auto_now_add=True)
     project_name = models.CharField(max_length=255)
+    sector = models.CharField(max_length=255)
     tipo_proyecto = models.CharField(max_length=255)
+    tipo_entidad = models.CharField(max_length=255)
     dependencia = models.CharField(max_length=255, null=True, blank=True)
     organismo = models.CharField(max_length=255, null=True, blank=True)
     municipio = models.CharField(max_length=255, null=True, blank=True)
     peticion_personal = models.CharField(max_length=255, null=True, blank=True)
+    unidad_responsable = models.CharField(max_length=255)
+    unidad_presupuestal = models.CharField(max_length=255)
+    ramo_presupuestal = models.CharField(max_length=255)
     monto_federal = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     monto_estatal = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     monto_municipal = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     monto_otros = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    inversion_estimada = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     descripcion = models.TextField()
     situacion_sin_proyecto = models.TextField()
     objetivos = models.TextField()
     metas = models.TextField()
+    gasto_programable = models.CharField(max_length=255)
     programa_presupuestario = models.CharField(max_length=255)
     beneficiarios = models.IntegerField(null=True, blank=True)
-    alineacion_normativa = models.CharField(max_length=255)
+    alineacion_normativa = models.TextField()
     region = models.CharField(max_length=255)
+    municipio_impacto = models.JSONField()
+    localidad = models.CharField(max_length=255)
+    barrio_colonia_ejido = models.CharField(max_length=255)
     latitud = models.FloatField()
     longitud = models.FloatField()
     plan_nacional = models.CharField(max_length=255)
     plan_estatal = models.CharField(max_length=255)
-    plan_municipal = models.CharField(max_length=255, null=True, blank=True)
+    plan_municipal = models.TextField(null=True, blank=True)
     ods = models.CharField(max_length=255)
     plan_sectorial = models.CharField(max_length=255)
-    unidad_responsable = models.CharField(max_length=255)
-    unidad_presupuestal = models.CharField(max_length=255)
-    ramo_presupuestal = models.CharField(max_length=255)
-    observaciones = models.TextField(null=True, blank=True)
-    gasto_programable = models.CharField(max_length=255)
     indicadores_estrategicos = models.CharField(max_length=255)
-    indicadores_tacticos = models.CharField(max_length=255)
-    indicadores_desempeno = models.TextField()
-    indicadores_rentabilidad = models.TextField()
+    indicadores_tacticos = models.CharField(max_length=255, null=True, blank=True)
     estado_inicial = models.ImageField(upload_to='estado_inicial/', null=True, blank=True)
     estado_con_proyecto = models.ImageField(upload_to='estado_con_proyecto/', null=True, blank=True)
-    fecha_registro = models.DateTimeField(auto_now_add=True)  # Establece la fecha de registro automáticamente
+    estudios_prospectivos = models.FileField(upload_to='estudios_prospectivos/', null=True, blank=True)
+    estudios_factibilidad = models.FileField(upload_to='estudios_factibilidad/', null=True, blank=True)
+    analisis_alternativas = models.FileField(upload_to='analisis_alternativas/', null=True, blank=True)
+    validacion_normativa = models.FileField(upload_to='validacion_normativa/', null=True, blank=True)
+    liberacion_derecho_via = models.FileField(upload_to='liberacion_derecho_via/', null=True, blank=True)
+    situacion_sin_proyecto_fotografico = models.FileField(upload_to='situacion_sin_proyecto_fotografico/', null=True, blank=True)
+    situacion_con_proyecto_proyeccion = models.FileField(upload_to='situacion_con_proyecto_proyeccion/', null=True, blank=True)
+    analisis_costo_beneficio = models.FileField(upload_to='analisis_costo_beneficio/', null=True, blank=True)
+    expediente_tecnico = models.FileField(upload_to='expediente_tecnico/', null=True, blank=True)
+    proyecto_ejecutivo = models.FileField(upload_to='proyecto_ejecutivo/', null=True, blank=True)
+    manifestacion_impacto_ambiental = models.FileField(upload_to='manifestacion_impacto_ambiental/', null=True, blank=True)
+    otros_estudios = models.FileField(upload_to='otros_estudios/', null=True, blank=True)
+    observaciones = models.TextField(null=True, blank=True)
 
     def __str__(self):
         return self.project_name
