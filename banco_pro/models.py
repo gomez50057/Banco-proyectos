@@ -28,7 +28,7 @@ class FormProject(models.Model):
     alineacion_normativa = models.TextField()
     region = models.CharField(max_length=255)
     municipio = models.CharField(max_length=255)
-    municipio_impacto = models.JSONField()
+    municipio_impacto = models.JSONField(null=True, blank=True)
     localidad = models.CharField(max_length=255)
     barrio_colonia_ejido = models.CharField(max_length=255)
     latitud = models.FloatField()

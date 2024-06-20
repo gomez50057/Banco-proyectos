@@ -4,6 +4,8 @@ from django.contrib import admin
 from django.views.generic import TemplateView
 from django.urls import path
 from . import views
+from django.contrib.auth import views as auth_views
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -17,6 +19,7 @@ urlpatterns = [
     # path('ver-proyectos/', views.ver_proyectos_registrados, name='ver_proyectos_registrados'),
 
     path('guardar-proyecto/', views.create_project, name='create_project'),
+    path('login/', auth_views.LoginView.as_view(template_name='LoginLayout'), name='login'),
 
 
 
