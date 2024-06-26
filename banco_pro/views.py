@@ -84,3 +84,48 @@ from .models import FormProject
 def project_list_view(request):
     projects = FormProject.objects.all()
     return render(request, {'projects': projects})
+
+
+# views.py
+
+from django.http import JsonResponse
+from django.views import View
+from .models import FormProject
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+import json
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ProjectView(View):
+    def get(self, request):
+        projects = FormProject.objects.values('id', 'project_name', 'descripcion', 'tipo_proyecto', 'municipio', 'beneficiarios')
+        return JsonResponse(list(projects), safe=False)
+
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            project = FormProject.objects.create(**data)
+            return JsonResponse({'message': 'Project created successfully', 'project': project.id})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    def put(self, request, pk):
+        try:
+            project = FormProject.objects.get(pk=pk)
+            data = json.loads(request.body)
+            for key, value in data.items():
+                setattr(project, key, value)
+            project.save()
+            return JsonResponse({'message': 'Project updated successfully'})
+        except FormProject.DoesNotExist:
+            return JsonResponse({'error': 'Project not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
+    def delete(self, request, pk):
+        try:
+            project = FormProject.objects.get(pk=pk)
+            project.delete()
+            return JsonResponse({'message': 'Project deleted successfully'})
+        except FormProject.DoesNotExist:
+            return JsonResponse({'error': 'Project not found'}, status=404)
