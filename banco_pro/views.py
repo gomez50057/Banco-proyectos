@@ -86,8 +86,6 @@ def project_list_view(request):
     return render(request, {'projects': projects})
 
 
-# views.py
-
 from django.http import JsonResponse
 from django.views import View
 from .models import FormProject
@@ -98,7 +96,22 @@ import json
 @method_decorator(csrf_exempt, name='dispatch')
 class ProjectView(View):
     def get(self, request):
-        projects = FormProject.objects.values('id', 'project_name', 'descripcion', 'tipo_proyecto', 'municipio', 'beneficiarios')
+        projects = FormProject.objects.values(
+            'id', 'fecha_registro', 'project_name', 'sector', 'tipo_proyecto', 'tipo_entidad',
+            'dependencia', 'organismo', 'municipioEnd', 'peticion_personal', 'unidad_responsable',
+            'unidad_presupuestal', 'ramo_presupuestal', 'monto_federal', 'monto_estatal',
+            'monto_municipal', 'monto_otros', 'inversion_estimada', 'descripcion',
+            'situacion_sin_proyecto', 'objetivos', 'metas', 'gasto_programable',
+            'programa_presupuestario', 'beneficiarios', 'alineacion_normativa', 'region',
+            'municipio', 'municipio_impacto', 'localidad', 'barrio_colonia_ejido', 'latitud',
+            'longitud', 'plan_nacional', 'plan_estatal', 'plan_municipal', 'ods', 'plan_sectorial',
+            'indicadores_estrategicos', 'indicadores_tacticos', 'indicadores_desempeno',
+            'indicadores_rentabilidad', 'estado_inicial', 'estado_con_proyecto', 'estudios_prospectivos',
+            'estudios_factibilidad', 'analisis_alternativas', 'validacion_normativa',
+            'liberacion_derecho_via', 'situacion_sin_proyecto_fotografico', 'situacion_con_proyecto_proyeccion',
+            'analisis_costo_beneficio', 'expediente_tecnico', 'proyecto_ejecutivo',
+            'manifestacion_impacto_ambiental', 'otros_estudios', 'observaciones'
+        )
         return JsonResponse(list(projects), safe=False)
 
     def post(self, request):
