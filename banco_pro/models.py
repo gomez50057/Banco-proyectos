@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class FormProject(models.Model):
     fecha_registro = models.DateField(auto_now_add=True)

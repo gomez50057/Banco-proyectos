@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'rest_framework',
@@ -41,8 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'jazzmin',
-
 ]
 
 MIDDLEWARE = [
@@ -144,3 +143,58 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Mi Administración",
+    "site_header": "Panel de Administración",
+    "site_brand": "Admin",
+    "site_logo": "path/to/your/logo.png",  # Cambia esto con la ruta a tu logo
+    "login_logo": "https://bibliotecadigitaluplaph.hidalgo.gob.mx/img_banco/Logotipo.webp",  # Cambia esto con la ruta a tu logo
+    "welcome_sign": "Bienvenido al Panel de Administración",
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "hide_apps": [],
+    "hide_models": [],
+    "order_with_respect_to": ["auth", "banco_pro", "another_app"],
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "banco_pro.Project": "fas fa-project-diagram",
+    },
+    "custom_links": {
+        "your_app_name": [{
+            "name": "Ver Proyectos",
+            "url": "/admin/projects/",
+            "icon": "fas fa-list",
+            "permissions": ["banco_pro.view_formproject"]
+        }]
+    },
+    # "custom_links": {
+    #     "banco_pro": [{
+    #         "name": "Enlace Personalizado",
+    #         "url": "https://www.example.com",
+    #         "icon": "fas fa-external-link-alt",
+    #         "permissions": ["banco_pro.view_project"]
+    #     }]
+    # },
+    "usermenu_links": [
+        {"name": "Soporte", "url": "https://www.example.com/support", "new_window": True},
+        {"model": "auth.user"}
+    ],
+    "changeform_format": "horizontal_tabs",
+    "changeform_format_overrides": {
+        "auth.user": "collapsible",
+        "auth.group": "vertical_tabs"
+    },
+    "related_modal_active": False,
+    "custom_css": "path/to/your/custom.css",  # Cambia esto con la ruta a tu archivo CSS personalizado
+    "custom_js": "path/to/your/custom.js",  # Cambia esto con la ruta a tu archivo JS personalizado
+    "show_ui_builder": True,
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "theme": "lumen",
+
+}

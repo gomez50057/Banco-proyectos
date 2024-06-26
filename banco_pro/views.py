@@ -41,12 +41,6 @@ def inicio_sesion(request):
     else:
         return Response({"error": "Credenciales inválidas"}, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(['GET'])
-def ver_usuarios_registrados(request):
-    usuarios = User.objects.all()
-    serializer = UserSerializer(usuarios, many=True)
-    return Response(serializer.data)
-
 @api_view(['POST'])
 def create_project(request):
     serializer = FormProjectSerializer(data=request.data)
@@ -81,3 +75,12 @@ class BulkCreateProjects(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# views.py
+from django.shortcuts import render
+from django.contrib.admin.views.decorators import staff_member_required
+from .models import FormProject
+
+@staff_member_required
+def project_list_view(request):
+    projects = FormProject.objects.all()
+    return render(request, {'projects': projects})
