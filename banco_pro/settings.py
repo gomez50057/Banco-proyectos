@@ -52,6 +52,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'banco_pro.middleware.admin_required_middleware',
+
 ]
 
 ROOT_URLCONF = 'banco_pro.urls'
