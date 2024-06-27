@@ -31,15 +31,36 @@ from .serializers import UserSerializer, FormProjectSerializer
 #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST'])
+# @api_view(['POST'])
+# def inicio_sesion(request):
+#     username = request.data.get('username')
+#     password = request.data.get('password')
+#     user = authenticate(request, username=username, password=password)
+#     if user is not None:
+#         return Response({"mensaje": "Inicio de sesión exitoso"}, status=status.HTTP_200_OK)
+#     else:
+#         return Response({"error": "Credenciales inválidas"}, status=status.HTTP_400_BAD_REQUEST)
+
+from django.contrib.auth import authenticate, login
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+
+@csrf_exempt
 def inicio_sesion(request):
-    username = request.data.get('username')
-    password = request.data.get('password')
-    user = authenticate(request, username=username, password=password)
-    if user is not None:
-        return Response({"mensaje": "Inicio de sesión exitoso"}, status=status.HTTP_200_OK)
-    else:
-        return Response({"error": "Credenciales inválidas"}, status=status.HTTP_400_BAD_REQUEST)
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        username = data.get('username')
+        password = data.get('password')
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            login(request, user)
+            group = user.groups.first().name if user.groups.exists() else 'sin grupo'
+            return JsonResponse({'status': 'ok', 'group': group})
+        else:
+            return JsonResponse({'status': 'error', 'message': 'Credenciales inválidas'}, status=400)
+
 
 @api_view(['POST'])
 def create_project(request):
