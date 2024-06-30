@@ -1,9 +1,15 @@
 from django.contrib import admin
 from django.views.generic import TemplateView
 from django.urls import path
+
 from . import views
 from django.contrib.auth import views as auth_views
 from .views import BulkCreateProjects, project_list_view, ProjectView, current_user
+
+from django.contrib import admin
+from django.urls import path, re_path
+from django.views.generic import TemplateView
+from .views import redirect_to_home
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -22,4 +28,11 @@ urlpatterns = [
     
     # URL para obtener el usuario actual
     path('api/current_user/', current_user, name='current_user'),
+
+
+
+  
+    path('login/', TemplateView.as_view(template_name='index.html'), name='login'),
+    path('table/', TemplateView.as_view(template_name='index.html'), name='table'),
+    re_path(r'^.*$', redirect_to_home),
 ]
