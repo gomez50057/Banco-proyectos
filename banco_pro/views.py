@@ -1,26 +1,19 @@
-from django.contrib.auth import authenticate
-from django.shortcuts import render
+from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.views import View
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import FormProject
-from .serializers import FormProjectSerializer
-from django.contrib.auth import authenticate, login
-from django.views.decorators.csrf import csrf_exempt
-import json
 from rest_framework.views import APIView
 from rest_framework import status
-from django.shortcuts import render
-from django.contrib.admin.views.decorators import staff_member_required
-from django.views import View
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from django.views import View
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
-from django.shortcuts import redirect
+import json
+
+from .models import FormProject
+from .serializers import FormProjectSerializer
 
 @csrf_exempt
 def inicio_sesion(request):
@@ -58,8 +51,7 @@ class BulkCreateProjects(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @staff_member_required
 def project_list_view(request):
