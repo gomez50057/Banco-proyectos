@@ -34,13 +34,13 @@ def inicio_sesion(request):
         else:
             return JsonResponse({'status': 'error', 'message': 'Credenciales inválidas'}, status=400)
 
-@api_view(['POST'])
-def create_project(request):
-    serializer = FormProjectSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# @api_view(['POST'])
+# def create_project(request):
+#     serializer = FormProjectSerializer(data=request.data)
+#     if serializer.is_valid():
+#         serializer.save()
+#         return Response(serializer.data, status=status.HTTP_201_CREATED)
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def ver_proyectos_tabla(request):
     proyectos = FormProject.objects.values('project_name', 'descripcion', 'tipo_proyecto', 'municipio', 'beneficiarios')
@@ -126,3 +126,38 @@ class ProjectView(View):
             return JsonResponse({'message': 'Project deleted successfully'})
         except FormProject.DoesNotExist:
             return JsonResponse({'error': 'Project not found'}, status=404)
+
+
+
+
+
+
+
+
+from .utils import siglas
+
+def generate_project_id(entity_type, entity_name, project_type, current_year):
+    entity_sigla = siglas[entity_type].get(entity_name, 'UNK')
+    project_type_sigla = project_type[0].upper() if project_type else 'X'
+    year = current_year
+    consecutive_number = FormProject.objects.filter(fecha_registro__year=current_year).count() + 1
+    consecutive_number = str(consecutive_number).zfill(3)
+
+    return f"{entity_sigla}{project_type_sigla}{year}{consecutive_number}"
+
+@api_view(['POST'])
+def create_project(request):
+    current_year = datetime.now().year
+    data = request.data.copy()
+    entity_type = data.get('tipo_entidad')
+    entity_name = data.get('dependencia') or data.get('organismo') or data.get('municipio')
+    project_type = data.get('tipo_proyecto')
+
+    project_id = generate_project_id(entity_type, entity_name, project_type, current_year)
+    data['project_id'] = project_id
+
+    serializer = FormProjectSerializer(data=data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
