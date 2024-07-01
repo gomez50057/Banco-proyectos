@@ -1,3 +1,4 @@
+# views.py
 from django.contrib.auth import authenticate, login
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
@@ -14,6 +15,9 @@ import json
 
 from .models import FormProject
 from .serializers import FormProjectSerializer
+
+from datetime import datetime
+from django.db.models import Max
 
 @csrf_exempt
 def inicio_sesion(request):
@@ -68,6 +72,9 @@ def current_user(request):
     }
     return JsonResponse(user_data)
 
+def redirect_to_home(request):
+    return redirect('/')
+
 @method_decorator(csrf_exempt, name='dispatch')
 class ProjectView(View):
     def get(self, request):
@@ -95,7 +102,7 @@ class ProjectView(View):
         try:
             data = json.loads(request.body)
             project = FormProject.objects.create(**data)
-            return JsonResponse({'message': 'Project created successfully', 'project': project.id})
+            return JsonResponse({'message': 'Project created successfully', 'project_name': project.project_name})
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
@@ -119,6 +126,3 @@ class ProjectView(View):
             return JsonResponse({'message': 'Project deleted successfully'})
         except FormProject.DoesNotExist:
             return JsonResponse({'error': 'Project not found'}, status=404)
-
-def redirect_to_home(request):
-    return redirect('/')

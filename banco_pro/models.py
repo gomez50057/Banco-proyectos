@@ -1,7 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import User
 
 class FormProject(models.Model):
+    project_id = models.CharField(max_length=50, unique=True, blank=True, null=True)
     fecha_registro = models.DateField(auto_now_add=True)
     project_name = models.CharField(max_length=255)
     sector = models.CharField(max_length=255)
@@ -14,11 +14,11 @@ class FormProject(models.Model):
     unidad_responsable = models.CharField(max_length=255)
     unidad_presupuestal = models.CharField(max_length=255)
     ramo_presupuestal = models.CharField(max_length=255)
-    monto_federal = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    monto_estatal = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    monto_municipal = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    monto_otros = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    inversion_estimada = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    monto_federal = models.DecimalField(max_digits=1000, decimal_places=2, null=True, blank=True)
+    monto_estatal = models.DecimalField(max_digits=1000, decimal_places=2, null=True, blank=True)
+    monto_municipal = models.DecimalField(max_digits=1000, decimal_places=2, null=True, blank=True)
+    monto_otros = models.DecimalField(max_digits=1000, decimal_places=2, null=True, blank=True)
+    inversion_estimada = models.DecimalField(max_digits=1000, decimal_places=2, null=True, blank=True)
     descripcion = models.TextField()
     situacion_sin_proyecto = models.TextField()
     objetivos = models.TextField()
