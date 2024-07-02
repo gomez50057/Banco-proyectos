@@ -179,3 +179,25 @@ siglas = {
         # Add all other municipalities here...
     }
 }
+
+sector_codes = {
+    'Agua': '1a',
+    'Comunicaciones y transportes': '1b',
+    'Electricidad': '1c',
+    'Hidrocarburos': '1d',
+    'Turismo': '1e',
+    'Educación': '2a',
+    'Ciencia y tecnología': '2b',
+    'Cultura': '2c',
+    'Deportes': '2d',
+    'Salud': '2e',
+    'Seguridad social': '2f',
+    'Urbanización y vivienda': '2g',
+    'Asistencia social': '2h',
+    'Seguridad nacional': '3a',
+    'Seguridad pública': '3b',
+    'Procuración de justicia': '3c',
+    'Otros relacionados con el desarrollo económico y social': '3d',
+    'Gubernamental, Oficinas administrativas': '4a',
+    'No identificados en las clasificaciones anteriores': '5a',
+}

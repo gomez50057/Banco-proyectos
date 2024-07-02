@@ -132,28 +132,46 @@ class ProjectView(View):
 
 
 
+from datetime import datetime
+from .models import FormProject
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import FormProjectSerializer
+from .utils import siglas, sector_codes
 
+def generate_project_id(entity_type, entity_name, sector, current_year):
+    # Ajustar para obtener correctamente la sigla
+    entity_sigla = siglas.get(entity_type, {}).get(entity_name, 'UNK')
+    
+    if entity_sigla == 'UNK':
+        print(f"Sigla no encontrada para el tipo de entidad: {entity_type} y nombre: {entity_name}")
 
-from .utils import siglas
+    sector_code = sector_codes.get(sector, 'XX')
+    if sector_code == 'XX':
+        print(f"Código de sector no proporcionado o inválido: {sector}")
 
-def generate_project_id(entity_type, entity_name, project_type, current_year):
-    entity_sigla = siglas[entity_type].get(entity_name, 'UNK')
-    project_type_sigla = project_type[0].upper() if project_type else 'X'
-    year = current_year
+    year = str(current_year)
     consecutive_number = FormProject.objects.filter(fecha_registro__year=current_year).count() + 1
     consecutive_number = str(consecutive_number).zfill(3)
 
-    return f"{entity_sigla}{project_type_sigla}{year}{consecutive_number}"
+    project_id = f"{entity_sigla}{sector_code}{year}{consecutive_number}"
+    print(f"Generado project_id: {project_id}")
+
+    return project_id
 
 @api_view(['POST'])
 def create_project(request):
     current_year = datetime.now().year
     data = request.data.copy()
     entity_type = data.get('tipo_entidad')
-    entity_name = data.get('dependencia') or data.get('organismo') or data.get('municipio')
-    project_type = data.get('tipo_proyecto')
+    entity_name = data.get('dependencia') if entity_type == 'Dependencia' else data.get('organismo') if entity_type == 'Organismo' else data.get('municipioEnd')
+    sector = data.get('sector')
 
-    project_id = generate_project_id(entity_type, entity_name, project_type, current_year)
+    if not entity_type or not entity_name or not sector:
+        return Response({'error': 'Faltan datos necesarios para generar el ID del proyecto.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    project_id = generate_project_id(entity_type, entity_name, sector, current_year)
     data['project_id'] = project_id
 
     serializer = FormProjectSerializer(data=data)
