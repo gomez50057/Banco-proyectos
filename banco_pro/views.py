@@ -90,11 +90,7 @@ class ProjectView(View):
             'longitud', 'plan_nacional', 'plan_estatal', 'plan_municipal', 'ods', 
             'plan_sectorial', 'indicadores_estrategicos', 'indicadores_tacticos', 
             'indicadores_desempeno', 'indicadores_rentabilidad', 'estado_inicial', 
-            'estado_con_proyecto', 'estudios_prospectivos', 'estudios_factibilidad', 
-            'analisis_alternativas', 'validacion_normativa', 'liberacion_derecho_via', 
-            'situacion_sin_proyecto_fotografico', 'situacion_con_proyecto_proyeccion', 
-            'analisis_costo_beneficio', 'expediente_tecnico', 'proyecto_ejecutivo', 
-            'manifestacion_impacto_ambiental', 'otros_estudios', 'observaciones'
+            'estado_con_proyecto', 'porcentaje_avance', 'estatus', 'situacion'
         )
         return JsonResponse(list(projects), safe=False)
 
@@ -126,7 +122,6 @@ class ProjectView(View):
             return JsonResponse({'message': 'Project deleted successfully'})
         except FormProject.DoesNotExist:
             return JsonResponse({'error': 'Project not found'}, status=404)
-
 
 
 
