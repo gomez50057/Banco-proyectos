@@ -124,9 +124,6 @@ class ProjectView(View):
             return JsonResponse({'error': 'Project not found'}, status=404)
 
 
-
-
-
 from datetime import datetime
 from .models import FormProject
 from rest_framework.decorators import api_view
