@@ -79,7 +79,7 @@ def redirect_to_home(request):
 class ProjectView(View):
     def get(self, request):
         projects = FormProject.objects.values(
-            'id', 'fecha_registro', 'project_name', 'sector', 'tipo_proyecto', 
+            'id', 'project_id','fecha_registro', 'project_name', 'sector', 'tipo_proyecto', 
             'tipo_entidad', 'dependencia', 'organismo', 'municipioEnd', 
             'peticion_personal', 'unidad_responsable', 'unidad_presupuestal', 
             'ramo_presupuestal', 'monto_federal', 'monto_estatal', 'monto_municipal', 
