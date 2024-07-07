@@ -79,24 +79,23 @@ def redirect_to_home(request):
 class ProjectView(View):
     def get(self, request):
         projects = FormProject.objects.values(
-            'id', 'project_id','fecha_registro', 'project_name', 'sector', 'tipo_proyecto', 
-            'tipo_entidad', 'dependencia', 'organismo', 'municipioEnd', 
-            'peticion_personal', 'unidad_responsable', 'unidad_presupuestal', 
-            'ramo_presupuestal', 'monto_federal', 'monto_estatal', 'monto_municipal', 
-            'monto_otros', 'inversion_estimada', 'descripcion', 'situacion_sin_proyecto', 
-            'objetivos', 'metas', 'gasto_programable', 'programa_presupuestario', 
-            'beneficiarios', 'alineacion_normativa', 'region', 'municipio', 
-            'municipio_impacto', 'localidad', 'barrio_colonia_ejido', 'latitud', 
-            'longitud', 'plan_nacional', 'plan_estatal', 'plan_municipal', 'ods', 
-            'plan_sectorial', 'indicadores_estrategicos', 'indicadores_tacticos', 
-            'indicadores_desempeno', 'indicadores_rentabilidad', 'estado_inicial', 
-            'estado_con_proyecto', 'porcentaje_avance', 'estatus', 'situacion', 'retroalimentacion',
+            'id', 'project_id', 'fecha_registro', 'project_name', 'sector', 'tipo_proyecto', 
+            'tipo_entidad', 'dependencia', 'organismo', 'municipioEnd', 'peticion_personal', 
+            'unidad_responsable', 'unidad_presupuestal', 'ramo_presupuestal', 'monto_federal', 
+            'monto_estatal', 'monto_municipal', 'monto_otros', 'inversion_estimada', 'descripcion', 
+            'situacion_sin_proyecto', 'objetivos', 'metas', 'gasto_programable', 'programa_presupuestario', 
+            'beneficiarios', 'alineacion_normativa', 'region', 'municipio', 'municipio_impacto', 
+            'localidad', 'barrio_colonia_ejido', 'latitud', 'longitud', 'plan_nacional', 'plan_estatal', 
+            'plan_municipal', 'ods', 'plan_sectorial', 'indicadores_estrategicos', 'indicadores_tacticos', 
+            'indicadores_desempeno', 'indicadores_rentabilidad', 'estado_inicial', 'estado_con_proyecto', 
+            'porcentaje_avance', 'estatus', 'situacion', 'retroalimentacion', 'user__username'
         )
         return JsonResponse(list(projects), safe=False)
 
     def post(self, request):
         try:
             data = json.loads(request.body)
+            data['user'] = request.user.id  # Agregar el usuario actual al proyecto
             project = FormProject.objects.create(**data)
             return JsonResponse({'message': 'Project created successfully', 'project_name': project.project_name})
         except Exception as e:

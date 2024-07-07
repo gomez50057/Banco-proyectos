@@ -1,6 +1,8 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class FormProject(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='projects')
     project_id = models.CharField(max_length=50, unique=True, blank=True, null=True)
     fecha_registro = models.DateField(auto_now_add=True)
     project_name = models.CharField(max_length=255)
