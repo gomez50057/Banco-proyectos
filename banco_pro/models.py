@@ -61,6 +61,7 @@ class FormProject(models.Model):
     porcentaje_avance = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     estatus = models.CharField(max_length=50, choices=[('Atendido', 'Atendido'), ('En Proceso', 'En Proceso'), ('Sin Avance', 'Sin Avance')], default='Sin Avance')
     situacion = models.CharField(max_length=50, choices=[('Vigente', 'Vigente'), ('Antecedente', 'Antecedente'), ('Cancelado', 'Cancelado')], default='Vigente')
+    retroalimentacion = models.TextField(null=True, blank=True)  
 
     def __str__(self):
         return self.project_name

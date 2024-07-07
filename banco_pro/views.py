@@ -90,7 +90,7 @@ class ProjectView(View):
             'longitud', 'plan_nacional', 'plan_estatal', 'plan_municipal', 'ods', 
             'plan_sectorial', 'indicadores_estrategicos', 'indicadores_tacticos', 
             'indicadores_desempeno', 'indicadores_rentabilidad', 'estado_inicial', 
-            'estado_con_proyecto', 'porcentaje_avance', 'estatus', 'situacion'
+            'estado_con_proyecto', 'porcentaje_avance', 'estatus', 'situacion', 'retroalimentacion',
         )
         return JsonResponse(list(projects), safe=False)
 
