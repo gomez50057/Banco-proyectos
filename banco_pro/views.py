@@ -43,7 +43,7 @@ def inicio_sesion(request):
 #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def ver_proyectos_tabla(request):
-    proyectos = FormProject.objects.values('project_name', 'descripcion', 'tipo_proyecto', 'municipio', 'beneficiarios')
+    proyectos = FormProject.objects.filter(estatus__in=['Atendido', 'En Proceso']).values('project_name', 'descripcion', 'tipo_proyecto', 'municipio', 'beneficiarios', 'estatus')
     return JsonResponse(list(proyectos), safe=False)
 
 class BulkCreateProjects(APIView):
