@@ -34,14 +34,6 @@ def inicio_sesion(request):
         else:
             return JsonResponse({'status': 'error', 'message': 'Credenciales inválidas'}, status=400)
 
-# @api_view(['POST'])
-# def create_project(request):
-#     serializer = FormProjectSerializer(data=request.data)
-#     if serializer.is_valid():
-#         serializer.save()
-#         return Response(serializer.data, status=status.HTTP_201_CREATED)
-#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 def ver_proyectos_tabla(request):
     proyectos = FormProject.objects.filter(estatus__in=['Atendido', 'En Proceso']).values('project_name', 'descripcion', 'tipo_proyecto', 'municipio', 'beneficiarios', 'estatus')
     return JsonResponse(list(proyectos), safe=False)
@@ -165,6 +157,7 @@ def create_project(request):
     project_id = generate_project_id(entity_type, entity_name, sector, current_year)
     data['project_id'] = project_id
 
+    data['user'] = request.user.id  # Añadir el ID del usuario autenticado
     serializer = FormProjectSerializer(data=data)
     if serializer.is_valid():
         serializer.save()
