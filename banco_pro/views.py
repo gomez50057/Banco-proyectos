@@ -19,6 +19,9 @@ from .serializers import FormProjectSerializer
 from datetime import datetime
 from django.db.models import Max
 
+from django.views.generic import TemplateView
+
+
 @csrf_exempt
 def inicio_sesion(request):
     if request.method == 'POST':
@@ -163,3 +166,6 @@ def create_project(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ReactAppView(TemplateView):
+    template_name = "index.html"

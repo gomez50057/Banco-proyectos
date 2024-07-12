@@ -3,6 +3,10 @@ from django.urls import path, re_path
 from django.views.generic import TemplateView
 from django.contrib.auth import views as auth_views
 
+from django.views.generic import TemplateView
+from .views import BulkCreateProjects, ProjectView, ReactAppView
+
+
 from . import views
 from .views import BulkCreateProjects, project_list_view, ProjectView, current_user, redirect_to_home
 
@@ -31,9 +35,12 @@ urlpatterns = [
     path('api/current_user/', current_user, name='current_user'),
 
     # Template views
-    path('login/', TemplateView.as_view(template_name='index.html'), name='login'),
-    path('table/', TemplateView.as_view(template_name='index.html'), name='table'),
-    
-    # Catch-all URL to redirect to home
-    re_path(r'^.*$', redirect_to_home),
+    path('login/', ReactAppView.as_view(), name='login'),
+    path('table/', ReactAppView.as_view(), name='table'),
+    path('panel-usuario/', ReactAppView.as_view(), name='panel-usuario'),
+    path('consulta/', ReactAppView.as_view(), name='consulta'),
+
+    # Para todas las demás rutas, redirige a la vista de React
+    re_path(r'^(?!admin|inicio-sesion|guardar-proyecto|masivacarga|ver-proyectos-tabla|proyecto|api|static).*$',
+            ReactAppView.as_view(), name='react-app'),
 ]
