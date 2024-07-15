@@ -36,6 +36,9 @@ def inicio_sesion(request):
             return JsonResponse({'status': 'ok', 'group': group})
         else:
             return JsonResponse({'status': 'error', 'message': 'Credenciales inválidas'}, status=400)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
+
 
 def ver_proyectos_tabla(request):
     proyectos = FormProject.objects.filter(estatus__in=['Atendido', 'En Proceso']).values('project_name', 'descripcion', 'tipo_proyecto', 'municipio', 'beneficiarios', 'estatus')
