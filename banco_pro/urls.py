@@ -30,7 +30,9 @@ urlpatterns = [
     path('ver-proyectos-tabla/', ProjectView.as_view(), name='ver-proyectos-tabla'),
     path('proyecto/<int:pk>/', ProjectView.as_view(), name='project-detail'),
     path('proyecto/', ProjectView.as_view(), name='project-create'),
-    
+
+    path('ver-proyectos-usuario/', views.ver_proyectos_usuario, name='ver_proyectos_usuario'),
+   
     # API URL to get the current user
     path('api/current_user/', current_user, name='current_user'),
 

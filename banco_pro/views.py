@@ -42,6 +42,14 @@ def ver_proyectos_tabla(request):
     )
     return JsonResponse(list(proyectos), safe=False)
 
+@login_required
+def ver_proyectos_usuario(request):
+    user = request.user
+    proyectos = FormProject.objects.filter(user=user).values(
+        'project_id', 'project_name', 'estatus', 'porcentaje_avance', 'observaciones'
+    )
+    return JsonResponse(list(proyectos), safe=False)
+
 class BulkCreateProjects(APIView):
     def post(self, request, *args, **kwargs):
         if not isinstance(request.data, list):
