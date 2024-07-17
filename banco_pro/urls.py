@@ -28,7 +28,9 @@ urlpatterns = [
     path('guardar-proyecto/', views.create_project, name='create_project'),
     path('masivacarga/', BulkCreateProjects.as_view(), name='bulk-create-projects'),
     path('ver-proyectos-tabla/', ProjectView.as_view(), name='ver-proyectos-tabla'),
-    path('proyecto/<int:pk>/', ProjectView.as_view(), name='project-detail'),
+    # path('proyecto/<int:pk>/', ProjectView.as_view(), name='project-detail'),
+    path('proyecto/<str:project_id>/', ProjectView.as_view(), name='project-detail'),
+
     path('proyecto/', ProjectView.as_view(), name='project-create'),
 
     path('ver-proyectos-usuario/', views.ver_proyectos_usuario, name='ver_proyectos_usuario'),

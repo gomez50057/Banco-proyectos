@@ -81,9 +81,9 @@ def redirect_to_home(request):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ProjectView(View):
-    def get(self, request, pk=None):
-        if pk:
-            project = get_object_or_404(FormProject, pk=pk)
+    def get(self, request, project_id=None):
+        if project_id:
+            project = get_object_or_404(FormProject, project_id=project_id)
             serializer = FormProjectSerializer(project)
             return JsonResponse(serializer.data, safe=False)
         else:
@@ -153,9 +153,9 @@ class ProjectView(View):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
-    def put(self, request, pk):
+    def put(self, request, project_id):
         try:
-            project = get_object_or_404(FormProject, pk=pk)
+            project = get_object_or_404(FormProject, project_id=project_id)
             data = json.loads(request.body)
             for key, value in data.items():
                 # Asegurarse de que los campos bloqueados no se actualicen
@@ -168,9 +168,9 @@ class ProjectView(View):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
-    def delete(self, request, pk):
+    def delete(self, request, project_id):
         try:
-            project = get_object_or_404(FormProject, pk=pk)
+            project = get_object_or_404(FormProject, project_id=project_id)
             project.delete()
             return JsonResponse({'message': 'Project deleted successfully'})
         except FormProject.DoesNotExist:
