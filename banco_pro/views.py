@@ -218,3 +218,72 @@ def create_project(request):
 
 class ReactAppView(TemplateView):
     template_name = "index.html"
+
+
+import io
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from .models import FormProject
+
+def generate_pdf(request, project_id):
+    # Crear un buffer en memoria para recibir los datos del PDF.
+    buffer = io.BytesIO()
+
+    # Crear el objeto PDF, usando el buffer como su "archivo".
+    p = canvas.Canvas(buffer, pagesize=letter)
+    width, height = letter
+
+    # Obtener el proyecto de la base de datos
+    project = get_object_or_404(FormProject, project_id=project_id)
+
+    # Dibujar en el PDF. Aquí es donde sucede la generación del PDF.
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(100, height - 100, f"Informe de proyecto para {project.project_name}")
+
+    p.setFont("Helvetica", 12)
+    p.drawString(100, height - 120, f"ID: {project.project_id}")
+    p.drawString(100, height - 140, f"Sector: {project.sector}")
+    p.drawString(100, height - 160, f"Tipo de Proyecto: {project.tipo_proyecto}")
+    p.drawString(100, height - 180, f"Dependencia: {project.dependencia}")
+    p.drawString(100, height - 200, f"Organismo: {project.organismo}")
+    p.drawString(100, height - 220, f"Municipio: {project.municipioEnd}")
+    p.drawString(100, height - 240, f"Unidad Responsable: {project.unidad_responsable}")
+    p.drawString(100, height - 260, f"Unidad Presupuestal: {project.unidad_presupuestal}")
+    p.drawString(100, height - 280, f"Ramo Presupuestal: {project.ramo_presupuestal}")
+    p.drawString(100, height - 300, f"Monto Federal: {project.monto_federal}")
+    p.drawString(100, height - 320, f"Monto Estatal: {project.monto_estatal}")
+    p.drawString(100, height - 340, f"Monto Municipal: {project.monto_municipal}")
+    p.drawString(100, height - 360, f"Monto Otros: {project.monto_otros}")
+    p.drawString(100, height - 380, f"Inversión Estimada: {project.inversion_estimada}")
+    p.drawString(100, height - 400, f"Descripción: {project.descripcion}")
+    p.drawString(100, height - 420, f"Situación Sin Proyecto: {project.situacion_sin_proyecto}")
+    p.drawString(100, height - 440, f"Objetivos: {project.objetivos}")
+    p.drawString(100, height - 460, f"Metas: {project.metas}")
+    p.drawString(100, height - 480, f"Gasto Programable: {project.gasto_programable}")
+    p.drawString(100, height - 500, f"Programa Presupuestario: {project.programa_presupuestario}")
+    p.drawString(100, height - 520, f"Beneficiarios: {project.beneficiarios}")
+    p.drawString(100, height - 540, f"Alineación Normativa: {project.alineacion_normativa}")
+    p.drawString(100, height - 560, f"Región: {project.region}")
+    p.drawString(100, height - 580, f"Municipio Impacto: {project.municipio_impacto}")
+    p.drawString(100, height - 600, f"Localidad: {project.localidad}")
+    p.drawString(100, height - 620, f"Barrio/Colonia/Ejido: {project.barrio_colonia_ejido}")
+    p.drawString(100, height - 640, f"Latitud: {project.latitud}")
+    p.drawString(100, height - 660, f"Longitud: {project.longitud}")
+    p.drawString(100, height - 680, f"Plan Nacional: {project.plan_nacional}")
+    p.drawString(100, height - 700, f"Plan Estatal: {project.plan_estatal}")
+    p.drawString(100, height - 720, f"Plan Municipal: {project.plan_municipal}")
+    p.drawString(100, height - 740, f"ODS: {project.ods}")
+    p.drawString(100, height - 760, f"Plan Sectorial: {project.plan_sectorial}")
+
+    # Cerrar el objeto PDF de manera limpia.
+    p.showPage()
+    p.save()
+
+    # Obtener el valor del buffer de BytesIO y escribirlo en la respuesta.
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/pdf')
+    response['Content-Disposition'] = f'inline; filename="project_{project_id}.pdf"'
+    return response
+

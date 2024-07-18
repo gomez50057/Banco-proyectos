@@ -6,6 +6,7 @@ from django.contrib.auth import views as auth_views
 from django.views.generic import TemplateView
 from .views import BulkCreateProjects, ProjectView, ReactAppView
 
+from .views import generate_pdf
 
 from . import views
 from .views import BulkCreateProjects, project_list_view, ProjectView, current_user, redirect_to_home
@@ -29,9 +30,9 @@ urlpatterns = [
     path('masivacarga/', BulkCreateProjects.as_view(), name='bulk-create-projects'),
     path('ver-proyectos-tabla/', ProjectView.as_view(), name='ver-proyectos-tabla'),
     # path('proyecto/<int:pk>/', ProjectView.as_view(), name='project-detail'),
-    path('proyecto/<str:project_id>/', ProjectView.as_view(), name='project-detail'),
-
     path('proyecto/', ProjectView.as_view(), name='project-create'),
+    path('proyecto/<str:project_id>/', ProjectView.as_view(), name='project-detail'),
+    path('proyecto/reporte/<str:project_id>/', generate_pdf, name='project-report'),
 
     path('ver-proyectos-usuario/', views.ver_proyectos_usuario, name='ver_proyectos_usuario'),
    
