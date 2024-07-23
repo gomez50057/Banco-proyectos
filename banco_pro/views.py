@@ -223,7 +223,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib.units import inch
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle, HRFlowable
-from reportlab.lib.enums import TA_CENTER, TA_LEFT
+from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
 from reportlab.lib import colors
 from django.http import HttpResponse
 import io
@@ -238,7 +238,7 @@ def generate_pdf(request, project_id):
     # Definir nuevos estilos
     styles.add(ParagraphStyle(name='CustomTitle', parent=styles['Heading1'], fontSize=20, spaceAfter=10, textColor=colors.HexColor('#691B32')))
     styles.add(ParagraphStyle(name='CustomSubTitle', parent=styles['Heading2'], fontSize=14, spaceAfter=10, textColor=colors.HexColor('#A02142')))
-    styles.add(ParagraphStyle(name='CustomBody', alignment=TA_LEFT, fontSize=12, spaceAfter=10, leading=15, textColor=colors.HexColor('#707271')))
+    styles.add(ParagraphStyle(name='CustomBody', alignment=TA_JUSTIFY, fontSize=12, spaceAfter=10, leading=15, textColor=colors.HexColor('#707271')))
     styles.add(ParagraphStyle(name='CustomCenter', alignment=TA_CENTER, fontSize=12, textColor=colors.HexColor('#707271')))
     styles.add(ParagraphStyle(name='CustomFooter', alignment=TA_CENTER, fontSize=10, textColor=colors.HexColor('#98989A'), spaceBefore=20))
     styles.add(ParagraphStyle(name='LabelStyle', fontSize=10, textColor=colors.HexColor('#A02142'), fontName='Helvetica-Bold'))
