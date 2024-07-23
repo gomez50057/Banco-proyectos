@@ -219,71 +219,131 @@ def create_project(request):
 class ReactAppView(TemplateView):
     template_name = "index.html"
 
-
-import io
-from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
 from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-from .models import FormProject
+from reportlab.lib.units import inch
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle, HRFlowable
+from reportlab.lib.enums import TA_CENTER, TA_LEFT
+from reportlab.lib import colors
+from django.http import HttpResponse
+import io
+from django.shortcuts import get_object_or_404
 
 def generate_pdf(request, project_id):
-    # Crear un buffer en memoria para recibir los datos del PDF.
     buffer = io.BytesIO()
+    
+    doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=40, leftMargin=40, topMargin=60, bottomMargin=40)
+    styles = getSampleStyleSheet()
 
-    # Crear el objeto PDF, usando el buffer como su "archivo".
-    p = canvas.Canvas(buffer, pagesize=letter)
-    width, height = letter
+    # Definir nuevos estilos
+    styles.add(ParagraphStyle(name='CustomTitle', parent=styles['Heading1'], fontSize=20, spaceAfter=10, textColor=colors.HexColor('#691B32')))
+    styles.add(ParagraphStyle(name='CustomSubTitle', parent=styles['Heading2'], fontSize=14, spaceAfter=10, textColor=colors.HexColor('#A02142')))
+    styles.add(ParagraphStyle(name='CustomBody', alignment=TA_LEFT, fontSize=12, spaceAfter=10, leading=15, textColor=colors.HexColor('#707271')))
+    styles.add(ParagraphStyle(name='CustomCenter', alignment=TA_CENTER, fontSize=12, textColor=colors.HexColor('#707271')))
+    styles.add(ParagraphStyle(name='CustomFooter', alignment=TA_CENTER, fontSize=10, textColor=colors.HexColor('#98989A'), spaceBefore=20))
+    styles.add(ParagraphStyle(name='LabelStyle', fontSize=10, textColor=colors.HexColor('#A02142'), fontName='Helvetica-Bold'))
 
-    # Obtener el proyecto de la base de datos
     project = get_object_or_404(FormProject, project_id=project_id)
 
-    # Dibujar en el PDF. Aquí es donde sucede la generación del PDF.
-    p.setFont("Helvetica-Bold", 16)
-    p.drawString(100, height - 100, f"Informe de proyecto para {project.project_name}")
+    elements = []
 
-    p.setFont("Helvetica", 12)
-    p.drawString(100, height - 120, f"ID: {project.project_id}")
-    p.drawString(100, height - 140, f"Sector: {project.sector}")
-    p.drawString(100, height - 160, f"Tipo de Proyecto: {project.tipo_proyecto}")
-    p.drawString(100, height - 180, f"Dependencia: {project.dependencia}")
-    p.drawString(100, height - 200, f"Organismo: {project.organismo}")
-    p.drawString(100, height - 220, f"Municipio: {project.municipioEnd}")
-    p.drawString(100, height - 240, f"Unidad Responsable: {project.unidad_responsable}")
-    p.drawString(100, height - 260, f"Unidad Presupuestal: {project.unidad_presupuestal}")
-    p.drawString(100, height - 280, f"Ramo Presupuestal: {project.ramo_presupuestal}")
-    p.drawString(100, height - 300, f"Monto Federal: {project.monto_federal}")
-    p.drawString(100, height - 320, f"Monto Estatal: {project.monto_estatal}")
-    p.drawString(100, height - 340, f"Monto Municipal: {project.monto_municipal}")
-    p.drawString(100, height - 360, f"Monto Otros: {project.monto_otros}")
-    p.drawString(100, height - 380, f"Inversión Estimada: {project.inversion_estimada}")
-    p.drawString(100, height - 400, f"Descripción: {project.descripcion}")
-    p.drawString(100, height - 420, f"Situación Sin Proyecto: {project.situacion_sin_proyecto}")
-    p.drawString(100, height - 440, f"Objetivos: {project.objetivos}")
-    p.drawString(100, height - 460, f"Metas: {project.metas}")
-    p.drawString(100, height - 480, f"Gasto Programable: {project.gasto_programable}")
-    p.drawString(100, height - 500, f"Programa Presupuestario: {project.programa_presupuestario}")
-    p.drawString(100, height - 520, f"Beneficiarios: {project.beneficiarios}")
-    p.drawString(100, height - 540, f"Alineación Normativa: {project.alineacion_normativa}")
-    p.drawString(100, height - 560, f"Región: {project.region}")
-    p.drawString(100, height - 580, f"Municipio Impacto: {project.municipio_impacto}")
-    p.drawString(100, height - 600, f"Localidad: {project.localidad}")
-    p.drawString(100, height - 620, f"Barrio/Colonia/Ejido: {project.barrio_colonia_ejido}")
-    p.drawString(100, height - 640, f"Latitud: {project.latitud}")
-    p.drawString(100, height - 660, f"Longitud: {project.longitud}")
-    p.drawString(100, height - 680, f"Plan Nacional: {project.plan_nacional}")
-    p.drawString(100, height - 700, f"Plan Estatal: {project.plan_estatal}")
-    p.drawString(100, height - 720, f"Plan Municipal: {project.plan_municipal}")
-    p.drawString(100, height - 740, f"ODS: {project.ods}")
-    p.drawString(100, height - 760, f"Plan Sectorial: {project.plan_sectorial}")
+    # Encabezado con logo alineado a la derecha
+    logo_url = "https://buenaspracticas.hidalgo.gob.mx/img/Logotipo.png"
+    logo_width, logo_height = 2.5 * inch, 0.35 * inch
+    logo = Image(logo_url, logo_width, logo_height)
 
-    # Cerrar el objeto PDF de manera limpia.
-    p.showPage()
-    p.save()
+    title_table_data = [
+        [
+            Paragraph(f"Proyecto: {project.project_name}", styles['CustomTitle']),
+            logo
+        ]
+    ]
 
-    # Obtener el valor del buffer de BytesIO y escribirlo en la respuesta.
+    title_table = Table(title_table_data, colWidths=[5.25 * inch, 2.5 * inch])
+    title_table.setStyle(TableStyle([
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+    ]))
+
+    elements.append(title_table)
+    elements.append(Spacer(1, 20))
+
+    # Línea divisoria
+    elements.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#A02142'), spaceBefore=10, spaceAfter=20, hAlign='CENTER', vAlign='BOTTOM', dash=None))
+    elements.append(Spacer(1, 12))
+
+    # Subtítulo y detalles del proyecto
+    elements.append(Paragraph("Detalles del Proyecto", styles['CustomSubTitle']))
+    elements.append(Spacer(1, 12))
+
+    # Detalles en una sola columna
+    single_column_details = [
+        ("Descripción", project.descripcion),
+        ("Situación Sin Proyecto", project.situacion_sin_proyecto),
+        ("Objetivos", project.objetivos),
+    ]
+
+    for label, value in single_column_details:
+        elements.append(Paragraph(f"<font face='Helvetica-Bold' color='#A02142'>{label}:</font>", styles['LabelStyle']))
+        elements.append(Paragraph(value, styles['CustomBody']))
+        elements.append(Spacer(1, 12))
+
+    elements.append(Spacer(1, 24))
+
+    # Crear una tabla para los detalles del proyecto
+    details = [
+        ("ID del Proyecto", str(project.project_id)),
+        ("Sector", project.sector),
+        ("Dependencia", project.dependencia),
+        ("Organismo", project.organismo),
+        ("Municipio", project.municipioEnd),
+        ("Monto Federal", f"${project.monto_federal:,.2f}"),
+        ("Monto Estatal", f"${project.monto_estatal:,.2f}"),
+        ("Monto Municipal", f"${project.monto_municipal:,.2f}"),
+        ("Monto Otros", f"${project.monto_otros:,.2f}"),
+        ("Inversión Estimada", f"${project.inversion_estimada:,.2f}"),
+        ("Región", project.region),
+        ("Localidad", project.localidad),
+        ("Municipio", project.municipio),
+        ("Barrio/Colonia/Ejido", project.barrio_colonia_ejido),
+        ("Latitud", str(project.latitud)),
+        ("Longitud", str(project.longitud)),
+        ("ODS", project.ods)
+    ]
+
+    # Organizar detalles en una tabla de dos columnas
+    detail_table_data = []
+    for i in range(0, len(details), 2):
+        row = []
+        for j in range(2):
+            if i + j < len(details):
+                label, value = details[i + j]
+                cell_content = Paragraph(f"<font face='Helvetica-Bold' color='#A02142'>{label}:</font> {value}", styles['CustomBody'])
+                row.append(cell_content)
+            else:
+                row.append('')
+        detail_table_data.append(row)
+
+    detail_table = Table(detail_table_data, colWidths=[3.25 * inch, 3.25 * inch])
+    detail_table.setStyle(TableStyle([
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+        ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor('#707271')),
+    ]))
+
+    elements.append(detail_table)
+    elements.append(Spacer(1, 24))
+
+    # Pie de página
+    elements.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#A02142'), spaceBefore=20, spaceAfter=10, hAlign='CENTER', vAlign='BOTTOM', dash=None))
+    elements.append(Spacer(1, 10))
+    elements.append(Paragraph("Gracias por su atención!", styles['CustomFooter']))
+    elements.append(Paragraph("contacto@buenaspracticas.hidalgo.gob.mx | buenaspracticas.hidalgo.gob.mx", styles['CustomFooter']))
+
+    doc.build(elements)
+
     buffer.seek(0)
     response = HttpResponse(buffer, content_type='application/pdf')
-    response['Content-Disposition'] = f'inline; filename="project_{project_id}.pdf"'
+    response['Content-Disposition'] = f'inline; filename="{project.project_id}.pdf"'
     return response
 
