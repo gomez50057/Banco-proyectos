@@ -232,7 +232,7 @@ from django.shortcuts import get_object_or_404
 def generate_pdf(request, project_id):
     buffer = io.BytesIO()
     
-    doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=40, leftMargin=40, topMargin=60, bottomMargin=40)
+    doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=40, leftMargin=40, topMargin=40, bottomMargin=40)
     styles = getSampleStyleSheet()
 
     # Definir nuevos estilos
