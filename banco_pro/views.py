@@ -236,7 +236,7 @@ def generate_pdf(request, project_id):
     styles = getSampleStyleSheet()
 
     # Definir nuevos estilos
-    styles.add(ParagraphStyle(name='CustomTitle', parent=styles['Heading1'], fontSize=20, spaceAfter=10, textColor=colors.HexColor('#691B32')))
+    styles.add(ParagraphStyle(name='CustomTitle', parent=styles['Heading1'], fontSize=18, alignment=TA_CENTER, spaceAfter=10, textColor=colors.HexColor('#691B32')))
     styles.add(ParagraphStyle(name='CustomSubTitle', parent=styles['Heading2'], fontSize=14, spaceAfter=10, textColor=colors.HexColor('#A02142')))
     styles.add(ParagraphStyle(name='CustomBody', alignment=TA_JUSTIFY, fontSize=12, spaceAfter=10, leading=15, textColor=colors.HexColor('#707271')))
     styles.add(ParagraphStyle(name='CustomCenter', alignment=TA_CENTER, fontSize=12, textColor=colors.HexColor('#707271')))
@@ -247,25 +247,16 @@ def generate_pdf(request, project_id):
 
     elements = []
 
-    # Encabezado con logo alineado a la derecha
+    # Encabezado con logo centrado fuera del margen
     logo_url = "https://buenaspracticas.hidalgo.gob.mx/img/Logotipo.png"
     logo_width, logo_height = 2.5 * inch, 0.35 * inch
     logo = Image(logo_url, logo_width, logo_height)
+    logo.hAlign = 'CENTER'
+    elements.append(logo)
+    elements.append(Spacer(1, 20))
 
-    title_table_data = [
-        [
-            Paragraph(f"Proyecto: {project.project_name}", styles['CustomTitle']),
-            logo
-        ]
-    ]
-
-    title_table = Table(title_table_data, colWidths=[5.25 * inch, 2.5 * inch])
-    title_table.setStyle(TableStyle([
-        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
-    ]))
-
-    elements.append(title_table)
+    # Título del documento centrado
+    elements.append(Paragraph(f"Proyecto: {project.project_name}", styles['CustomTitle']))
     elements.append(Spacer(1, 20))
 
     # Línea divisoria
@@ -346,4 +337,3 @@ def generate_pdf(request, project_id):
     response = HttpResponse(buffer, content_type='application/pdf')
     response['Content-Disposition'] = f'inline; filename="{project.project_id}.pdf"'
     return response
-
