@@ -2,14 +2,9 @@ from django.contrib import admin
 from django.urls import path, re_path
 from django.views.generic import TemplateView
 from django.contrib.auth import views as auth_views
-
-from django.views.generic import TemplateView
-from .views import BulkCreateProjects, ProjectView, ReactAppView
-
-from .views import generate_pdf
-
+from .views import BulkCreateProjects, ProjectView, ReactAppView, generate_pdf
 from . import views
-from .views import BulkCreateProjects, project_list_view, ProjectView, current_user, redirect_to_home
+from .views import project_list_view, current_user
 
 urlpatterns = [
     # Admin URL
@@ -29,7 +24,6 @@ urlpatterns = [
     path('guardar-proyecto/', views.create_project, name='create_project'),
     path('masivacarga/', BulkCreateProjects.as_view(), name='bulk-create-projects'),
     path('ver-proyectos-tabla/', ProjectView.as_view(), name='ver-proyectos-tabla'),
-    # path('proyecto/<int:pk>/', ProjectView.as_view(), name='project-detail'),
     path('proyecto/', ProjectView.as_view(), name='project-create'),
     path('proyecto/<str:project_id>/', ProjectView.as_view(), name='project-detail'),
     path('proyecto/reporte/<str:project_id>/', generate_pdf, name='project-report'),
