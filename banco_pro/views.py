@@ -219,121 +219,154 @@ def create_project(request):
 class ReactAppView(TemplateView):
     template_name = "index.html"
 
-from reportlab.lib.pagesizes import letter
-from reportlab.lib.units import inch
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle, HRFlowable
-from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
-from reportlab.lib import colors
-from django.http import HttpResponse
-import io
-from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .models import FormProject
+from .serializers import FormProjectSerializer
 
-def generate_pdf(request, project_id):
-    buffer = io.BytesIO()
+class UpdateProjectView(APIView):
+    def put(self, request, project_id):
+        try:
+            project = FormProject.objects.get(project_id=project_id)
+        except FormProject.DoesNotExist:
+            return Response({"error": "Project not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = FormProjectSerializer(project, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# from reportlab.lib.pagesizes import letter
+# from reportlab.lib.units import inch
+# from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+# from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle, HRFlowable
+# from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
+# from reportlab.lib import colors
+# from django.http import HttpResponse
+# import io
+# from django.shortcuts import get_object_or_404
+
+# def generate_pdf(request, project_id):
+#     buffer = io.BytesIO()
     
-    doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=40, leftMargin=40, topMargin=40, bottomMargin=40)
-    styles = getSampleStyleSheet()
+#     doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=40, leftMargin=40, topMargin=40, bottomMargin=40)
+#     styles = getSampleStyleSheet()
 
-    # Definir nuevos estilos
-    styles.add(ParagraphStyle(name='CustomTitle', parent=styles['Heading1'], fontSize=18, alignment=TA_CENTER, spaceAfter=10, textColor=colors.HexColor('#691B32')))
-    styles.add(ParagraphStyle(name='CustomSubTitle', parent=styles['Heading2'], fontSize=14, spaceAfter=10, textColor=colors.HexColor('#A02142')))
-    styles.add(ParagraphStyle(name='CustomBody', alignment=TA_JUSTIFY, fontSize=12, spaceAfter=10, leading=15, textColor=colors.HexColor('#707271')))
-    styles.add(ParagraphStyle(name='CustomCenter', alignment=TA_CENTER, fontSize=12, textColor=colors.HexColor('#707271')))
-    styles.add(ParagraphStyle(name='CustomFooter', alignment=TA_CENTER, fontSize=10, textColor=colors.HexColor('#98989A'), spaceBefore=20))
-    styles.add(ParagraphStyle(name='LabelStyle', fontSize=10, textColor=colors.HexColor('#A02142'), fontName='Helvetica-Bold'))
+#     # Definir nuevos estilos
+#     styles.add(ParagraphStyle(name='CustomTitle', parent=styles['Heading1'], fontSize=18, alignment=TA_CENTER, spaceAfter=10, textColor=colors.HexColor('#691B32')))
+#     styles.add(ParagraphStyle(name='CustomSubTitle', parent=styles['Heading2'], fontSize=14, spaceAfter=10, textColor=colors.HexColor('#A02142')))
+#     styles.add(ParagraphStyle(name='CustomBody', alignment=TA_JUSTIFY, fontSize=12, spaceAfter=10, leading=15, textColor=colors.HexColor('#707271')))
+#     styles.add(ParagraphStyle(name='CustomCenter', alignment=TA_CENTER, fontSize=12, textColor=colors.HexColor('#707271')))
+#     styles.add(ParagraphStyle(name='CustomFooter', alignment=TA_CENTER, fontSize=10, textColor=colors.HexColor('#98989A'), spaceBefore=20))
+#     styles.add(ParagraphStyle(name='LabelStyle', fontSize=10, textColor=colors.HexColor('#A02142'), fontName='Helvetica-Bold'))
 
-    project = get_object_or_404(FormProject, project_id=project_id)
+#     project = get_object_or_404(FormProject, project_id=project_id)
 
-    elements = []
+#     elements = []
 
-    # Encabezado con logo centrado fuera del margen
-    logo_url = "https://buenaspracticas.hidalgo.gob.mx/img/Logotipo.png"
-    logo_width, logo_height = 2.5 * inch, 0.35 * inch
-    logo = Image(logo_url, logo_width, logo_height)
-    logo.hAlign = 'CENTER'
-    elements.append(logo)
-    elements.append(Spacer(1, 20))
+#     # Encabezado con logo centrado fuera del margen
+#     logo_url = "https://buenaspracticas.hidalgo.gob.mx/img/Logotipo.png"
+#     logo_width, logo_height = 2.5 * inch, 0.35 * inch
+#     logo = Image(logo_url, logo_width, logo_height)
+#     logo.hAlign = 'CENTER'
+#     elements.append(logo)
+#     elements.append(Spacer(1, 20))
 
-    # Título del documento centrado
-    elements.append(Paragraph(f"Proyecto: {project.project_name}", styles['CustomTitle']))
-    elements.append(Spacer(1, 20))
+#     # Título del documento centrado
+#     elements.append(Paragraph(f"Proyecto: {project.project_name}", styles['CustomTitle']))
+#     elements.append(Spacer(1, 20))
 
-    # Línea divisoria
-    elements.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#A02142'), spaceBefore=10, spaceAfter=20, hAlign='CENTER', vAlign='BOTTOM', dash=None))
-    elements.append(Spacer(1, 12))
+#     # Línea divisoria
+#     elements.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#A02142'), spaceBefore=10, spaceAfter=20, hAlign='CENTER', vAlign='BOTTOM', dash=None))
+#     elements.append(Spacer(1, 12))
 
-    # Subtítulo y detalles del proyecto
-    elements.append(Paragraph("Detalles del Proyecto", styles['CustomSubTitle']))
-    elements.append(Spacer(1, 12))
+#     # Subtítulo y detalles del proyecto
+#     elements.append(Paragraph("Detalles del Proyecto", styles['CustomSubTitle']))
+#     elements.append(Spacer(1, 12))
 
-    # Detalles en una sola columna
-    single_column_details = [
-        ("Descripción", project.descripcion),
-        ("Situación Sin Proyecto", project.situacion_sin_proyecto),
-        ("Objetivos", project.objetivos),
-    ]
+#     # Detalles en una sola columna
+#     single_column_details = [
+#         ("Descripción", project.descripcion),
+#         ("Situación Sin Proyecto", project.situacion_sin_proyecto),
+#         ("Objetivos", project.objetivos),
+#     ]
 
-    for label, value in single_column_details:
-        elements.append(Paragraph(f"<font face='Helvetica-Bold' color='#A02142'>{label}:</font>", styles['LabelStyle']))
-        elements.append(Paragraph(value, styles['CustomBody']))
-        elements.append(Spacer(1, 12))
+#     for label, value in single_column_details:
+#         elements.append(Paragraph(f"<font face='Helvetica-Bold' color='#A02142'>{label}:</font>", styles['LabelStyle']))
+#         elements.append(Paragraph(value, styles['CustomBody']))
+#         elements.append(Spacer(1, 12))
 
-    elements.append(Spacer(1, 24))
+#     elements.append(Spacer(1, 24))
 
-    # Crear una tabla para los detalles del proyecto
-    details = [
-        ("ID del Proyecto", str(project.project_id)),
-        ("Sector", project.sector),
-        ("Dependencia", project.dependencia),
-        ("Organismo", project.organismo),
-        ("Municipio", project.municipioEnd),
-        ("Monto Federal", f"${project.monto_federal:,.2f}"),
-        ("Monto Estatal", f"${project.monto_estatal:,.2f}"),
-        ("Monto Municipal", f"${project.monto_municipal:,.2f}"),
-        ("Monto Otros", f"${project.monto_otros:,.2f}"),
-        ("Inversión Estimada", f"${project.inversion_estimada:,.2f}"),
-        ("Región", project.region),
-        ("Localidad", project.localidad),
-        ("Municipio", project.municipio),
-        ("Barrio/Colonia/Ejido", project.barrio_colonia_ejido),
-        ("Latitud", str(project.latitud)),
-        ("Longitud", str(project.longitud)),
-        ("ODS", project.ods)
-    ]
+#     # Crear una tabla para los detalles del proyecto
+#     details = [
+#         ("ID del Proyecto", str(project.project_id)),
+#         ("Sector", project.sector),
+#         ("Dependencia", project.dependencia),
+#         ("Organismo", project.organismo),
+#         ("Municipio", project.municipioEnd),
+#         ("Monto Federal", f"${project.monto_federal:,.2f}"),
+#         ("Monto Estatal", f"${project.monto_estatal:,.2f}"),
+#         ("Monto Municipal", f"${project.monto_municipal:,.2f}"),
+#         ("Monto Otros", f"${project.monto_otros:,.2f}"),
+#         ("Inversión Estimada", f"${project.inversion_estimada:,.2f}"),
+#         ("Región", project.region),
+#         ("Localidad", project.localidad),
+#         ("Municipio", project.municipio),
+#         ("Barrio/Colonia/Ejido", project.barrio_colonia_ejido),
+#         ("Latitud", str(project.latitud)),
+#         ("Longitud", str(project.longitud)),
+#         ("ODS", project.ods)
+#     ]
 
-    # Organizar detalles en una tabla de dos columnas
-    detail_table_data = []
-    for i in range(0, len(details), 2):
-        row = []
-        for j in range(2):
-            if i + j < len(details):
-                label, value = details[i + j]
-                cell_content = Paragraph(f"<font face='Helvetica-Bold' color='#A02142'>{label}:</font> {value}", styles['CustomBody'])
-                row.append(cell_content)
-            else:
-                row.append('')
-        detail_table_data.append(row)
+#     # Organizar detalles en una tabla de dos columnas
+#     detail_table_data = []
+#     for i in range(0, len(details), 2):
+#         row = []
+#         for j in range(2):
+#             if i + j < len(details):
+#                 label, value = details[i + j]
+#                 cell_content = Paragraph(f"<font face='Helvetica-Bold' color='#A02142'>{label}:</font> {value}", styles['CustomBody'])
+#                 row.append(cell_content)
+#             else:
+#                 row.append('')
+#         detail_table_data.append(row)
 
-    detail_table = Table(detail_table_data, colWidths=[3.25 * inch, 3.25 * inch])
-    detail_table.setStyle(TableStyle([
-        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-        ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor('#707271')),
-    ]))
+#     detail_table = Table(detail_table_data, colWidths=[3.25 * inch, 3.25 * inch])
+#     detail_table.setStyle(TableStyle([
+#         ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+#         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+#         ('TEXTCOLOR', (0, 0), (-1, -1), colors.HexColor('#707271')),
+#     ]))
 
-    elements.append(detail_table)
-    elements.append(Spacer(1, 24))
+#     elements.append(detail_table)
+#     elements.append(Spacer(1, 24))
 
-    # Pie de página
-    elements.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#A02142'), spaceBefore=20, spaceAfter=10, hAlign='CENTER', vAlign='BOTTOM', dash=None))
-    elements.append(Spacer(1, 10))
-    elements.append(Paragraph("Gracias por su atención!", styles['CustomFooter']))
-    elements.append(Paragraph("contacto@buenaspracticas.hidalgo.gob.mx | buenaspracticas.hidalgo.gob.mx", styles['CustomFooter']))
+#     # Pie de página
+#     elements.append(HRFlowable(width="100%", thickness=1, color=colors.HexColor('#A02142'), spaceBefore=20, spaceAfter=10, hAlign='CENTER', vAlign='BOTTOM', dash=None))
+#     elements.append(Spacer(1, 10))
+#     elements.append(Paragraph("Gracias por su atención!", styles['CustomFooter']))
+#     elements.append(Paragraph("contacto@buenaspracticas.hidalgo.gob.mx | buenaspracticas.hidalgo.gob.mx", styles['CustomFooter']))
 
-    doc.build(elements)
+#     doc.build(elements)
 
-    buffer.seek(0)
-    response = HttpResponse(buffer, content_type='application/pdf')
-    response['Content-Disposition'] = f'inline; filename="{project.project_id}.pdf"'
-    return response
+#     buffer.seek(0)
+#     response = HttpResponse(buffer, content_type='application/pdf')
+#     response['Content-Disposition'] = f'inline; filename="{project.project_id}.pdf"'
+#     return response
