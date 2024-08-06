@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.urls import path, re_path
 from django.views.generic import TemplateView
 from django.contrib.auth import views as auth_views
-from .views import BulkCreateProjects, ProjectView, ReactAppView, generate_pdf, UpdateProjectView
+from .views import BulkCreateProjects, ProjectView, ReactAppView, UpdateProjectView
+# from .views import BulkCreateProjects, ProjectView, ReactAppView, generate_pdf, UpdateProjectView
 from . import views
 from .views import project_list_view, current_user
 
@@ -26,7 +27,7 @@ urlpatterns = [
     path('ver-proyectos-tabla/', ProjectView.as_view(), name='ver-proyectos-tabla'),
     path('proyecto/', ProjectView.as_view(), name='project-create'),
     path('proyecto/<str:project_id>/', ProjectView.as_view(), name='project-detail'),
-    path('proyecto/reporte/<str:project_id>/', generate_pdf, name='project-report'),
+    # path('proyecto/reporte/<str:project_id>/', generate_pdf, name='project-report'),
     path('update-project/<str:project_id>/', UpdateProjectView.as_view(), name='update-project'),
 
     path('ver-proyectos-usuario/', views.ver_proyectos_usuario, name='ver_proyectos_usuario'),
