@@ -17,7 +17,21 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username']
 
+class UserRelatedField(serializers.RelatedField):
+    def to_representation(self, value):
+        return value.username
+
+    def to_internal_value(self, data):
+        try:
+            user = User.objects.get(username=data)
+            return user
+        except User.DoesNotExist:
+            raise serializers.ValidationError(f'No se encontró un usuario con el nombre {data}')
+
 class FormProjectSerializer(serializers.ModelSerializer):
+    user = UserRelatedField(queryset=User.objects.all())
+
     class Meta:
         model = FormProject
-        fields = '__all__'  # Incluye todos los campos del modelo
+        fields = '__all__'
+
