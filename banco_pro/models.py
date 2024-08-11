@@ -62,7 +62,7 @@ class FormProject(models.Model):
     otros_estudios = models.FileField(upload_to='documentos/otros_estudios/', null=True, blank=True)
     observaciones = models.TextField(null=True, blank=True)
     porcentaje_avance = models.DecimalField(max_digits=5, decimal_places=2, default=0)
-    estatus = models.CharField(max_length=50, choices=[('Atendido', 'Atendido'), ('En Proceso', 'En Proceso'), ('Sin Avance', 'Sin Avance')], default='Sin Avance')
+    estatus = models.CharField(max_length=50, choices=[('Atendido', 'Atendido'), ('En Proceso', 'En Proceso'), ('Registrado', 'Registrado')], default='Registrado')
     situacion = models.CharField(max_length=50, choices=[('Vigente', 'Vigente'), ('Antecedente', 'Antecedente'), ('Cancelado', 'Cancelado')], default='Vigente')
     retroalimentacion = models.TextField(null=True, blank=True)
 
