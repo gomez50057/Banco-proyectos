@@ -144,7 +144,7 @@ class ProjectView(View):
     def post(self, request):
         try:
             data = json.loads(request.body)
-            data['user'] = request.user.id  # Agregar el usuario actual al proyecto
+            data['user'] = request.user.username  # Agregar el usuario actual al proyecto
             serializer = FormProjectSerializer(data=data)
             if serializer.is_valid():
                 serializer.save()
@@ -209,7 +209,7 @@ def create_project(request):
     project_id = generate_project_id(entity_type, entity_name, sector, current_year)
     data['project_id'] = project_id
 
-    data['user'] = request.user.id  # Añadir el ID del usuario autenticado
+    data['user'] = request.user.username  # Añadir el ID del usuario autenticado
     serializer = FormProjectSerializer(data=data)
     if serializer.is_valid():
         serializer.save()
