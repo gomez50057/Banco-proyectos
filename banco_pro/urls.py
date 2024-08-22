@@ -21,7 +21,6 @@ urlpatterns = [
 
     path('bulk-create-users/', BulkCreateUsers.as_view(), name='bulk-create-users'),
 
-    
     # User authentication URLs
     path('inicio-sesion/', views.inicio_sesion, name='inicio_sesion'),
     # path('login/', auth_views.LoginView.as_view(template_name='LoginLayout'), name='login'),
