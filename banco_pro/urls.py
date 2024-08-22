@@ -6,6 +6,8 @@ from .views import BulkCreateProjects, ProjectView, ReactAppView, UpdateProjectV
 # from .views import BulkCreateProjects, ProjectView, ReactAppView, generate_pdf, UpdateProjectView
 from . import views
 from .views import project_list_view, current_user
+from .views import BulkCreateUsers
+
 
 urlpatterns = [
     # Admin URL
@@ -16,10 +18,13 @@ urlpatterns = [
     
     # Admin project list view
     path('admin/projects/', project_list_view, name='project-list'),
+
+    path('bulk-create-users/', BulkCreateUsers.as_view(), name='bulk-create-users'),
+
     
     # User authentication URLs
     path('inicio-sesion/', views.inicio_sesion, name='inicio_sesion'),
-    path('login/', auth_views.LoginView.as_view(template_name='LoginLayout'), name='login'),
+    # path('login/', auth_views.LoginView.as_view(template_name='LoginLayout'), name='login'),
 
     # Project-related URLs
     path('guardar-proyecto/', views.create_project, name='create_project'),

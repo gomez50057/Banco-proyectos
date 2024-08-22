@@ -13,6 +13,8 @@ from rest_framework import status
 import json
 from datetime import datetime
 
+from django.contrib.auth.models import User, Group
+
 from .models import FormProject
 from .serializers import FormProjectSerializer
 from .utils import siglas, sector_codes
@@ -35,6 +37,42 @@ def inicio_sesion(request):
             return JsonResponse({'status': 'error', 'message': 'Credenciales inválidas'}, status=400)
     else:
         return JsonResponse({'status': 'error', 'message': 'Método no permitido'}, status=405)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class BulkCreateUsers(View):
+    def post(self, request):
+        try:
+            # Lee el cuerpo de la solicitud y conviértelo a un objeto JSON
+            data = json.loads(request.body)
+            
+            # Verifica que data sea una lista de usuarios
+            if not isinstance(data, list):
+                return JsonResponse({"error": "Se esperaba una lista de objetos"}, status=400)
+            
+            created_users = []
+            for user_data in data:
+                username = user_data.get('username')
+                password = user_data.get('password')
+                tipo_cuenta = user_data.get('tipo_cuenta')
+
+                if not username or not password or not tipo_cuenta:
+                    return JsonResponse({"error": "Faltan datos requeridos: 'username', 'password', o 'tipo_cuenta'"}, status=400)
+
+                # Crear el usuario
+                user = User.objects.create_user(username=username, password=password)
+
+                # Añadir el usuario al grupo correspondiente
+                group, created = Group.objects.get_or_create(name=tipo_cuenta)
+                user.groups.add(group)
+                user.save()
+
+                created_users.append(user.username)
+
+            return JsonResponse({"message": "Usuarios creados con éxito", "users": created_users}, status=201)
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
 
 def ver_proyectos_tabla(request):
     proyectos = FormProject.objects.filter(estatus__in=['Atendido', 'En Proceso']).values(
