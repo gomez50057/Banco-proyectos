@@ -16,10 +16,9 @@ from datetime import datetime
 from django.contrib.auth.models import User, Group
 
 from .models import FormProject
-from .serializers import FormProjectSerializer
+from .serializers import FormProjectSerializer, BulkCreateProjectSerializer, FormProjectSerializer 
 from .utils import siglas, sector_codes
 from django.views.generic import TemplateView
-
 
 @csrf_exempt
 def inicio_sesion(request):
@@ -93,7 +92,7 @@ class BulkCreateProjects(APIView):
         if not isinstance(request.data, list):
             return Response({"error": "Se esperaba una lista de objetos"}, status=status.HTTP_400_BAD_REQUEST)
         
-        serializer = FormProjectSerializer(data=request.data, many=True)
+        serializer = BulkCreateProjectSerializer(data=request.data, many=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -256,12 +255,6 @@ def create_project(request):
 
 class ReactAppView(TemplateView):
     template_name = "index.html"
-
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from .models import FormProject
-from .serializers import FormProjectSerializer
 
 class UpdateProjectView(APIView):
     def put(self, request, project_id):

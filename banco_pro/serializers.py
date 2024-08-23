@@ -35,3 +35,14 @@ class FormProjectSerializer(serializers.ModelSerializer):
         model = FormProject
         fields = '__all__'
 
+class BulkCreateProjectSerializer(serializers.ModelSerializer):
+    user = UserRelatedField(queryset=User.objects.all())
+
+    class Meta:
+        model = FormProject
+        fields = '__all__'
+        extra_kwargs = {
+            'latitud': {'required': False, 'allow_null': True},
+            'longitud': {'required': False, 'allow_null': True},
+        }
+
