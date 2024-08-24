@@ -79,6 +79,7 @@ class FormProject(models.Model):
     retroalimentacion = models.TextField(null=True, blank=True)
 
     # Campos de bloqueo
+    isBlocked_project = models.BooleanField(default=True)
     isBlocked_project_name = models.BooleanField(default=False)
     isBlocked_sector = models.BooleanField(default=False)
     isBlocked_tipo_proyecto = models.BooleanField(default=False)

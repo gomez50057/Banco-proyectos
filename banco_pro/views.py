@@ -83,7 +83,7 @@ def ver_proyectos_tabla(request):
 def ver_proyectos_usuario(request):
     user = request.user
     proyectos = FormProject.objects.filter(user=user).values(
-        'project_id', 'project_name', 'estatus', 'porcentaje_avance', 'observaciones'
+        'isBlocked_project','estatus' , 'project_id', 'project_name', 'estatus', 'porcentaje_avance', 'observaciones'
     )
     return JsonResponse(list(proyectos), safe=False)
 
@@ -140,6 +140,7 @@ class ProjectView(View):
                 'otros_estudios', 'observaciones', 'porcentaje_avance', 'estatus', 'situacion', 'retroalimentacion',
                 'user__username',
                 # Campos de bloqueo
+                'isBlocked_project',
                 'isBlocked_project_name', 'isBlocked_sector', 'isBlocked_tipo_proyecto', 'isBlocked_tipo_entidad',
                 'isBlocked_dependencia', 'isBlocked_organismo', 'isBlocked_municipioEnd', 'isBlocked_peticion_personal',
                 'isBlocked_unidad_responsable', 'isBlocked_unidad_presupuestal', 'isBlocked_ramo_presupuestal',
