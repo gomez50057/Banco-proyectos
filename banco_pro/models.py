@@ -3,16 +3,16 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class FormProject(models.Model):
-    nombre_dependencia = models.CharField(max_length=255, default="")
-    area_adscripcion = models.CharField(max_length=255, default="")
-    nombre_registrante = models.CharField(max_length=255, default="")
-    apellido_paterno = models.CharField(max_length=255, default="")
-    apellido_materno = models.CharField(max_length=255, default="")
-    correo_institucional = models.EmailField(max_length=255, default="")
-    telefono_oficina = models.CharField(max_length=10, default="")
+    nombre_dependencia = models.CharField(max_length=255, null=True, blank=True, default="")
+    area_adscripcion = models.CharField(max_length=255, null=True, blank=True, default="")
+    nombre_registrante = models.CharField(max_length=255, null=True, blank=True, default="")
+    apellido_paterno = models.CharField(max_length=255, null=True, blank=True, default="")
+    apellido_materno = models.CharField(max_length=255, null=True, blank=True, default="")
+    correo_institucional = models.EmailField(max_length=255, null=True, blank=True, default="")
+    telefono_oficina = models.CharField(max_length=10, null=True, blank=True, default="")
     telefono_oficina_ext = models.CharField(max_length=10, null=True, blank=True, default="")
-    correo_personal = models.EmailField(max_length=255, default="")
-    telefono_particular = models.CharField(max_length=10, default="")
+    correo_personal = models.EmailField(max_length=255, null=True, blank=True, default="")
+    telefono_particular = models.CharField(max_length=10, null=True, blank=True, default="")
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='projects')
     project_id = models.CharField(max_length=50, unique=True, blank=True, null=True)
