@@ -5,8 +5,9 @@ from django.contrib.auth import views as auth_views
 from .views import BulkCreateProjects, ProjectView, ReactAppView, UpdateProjectView
 # from .views import BulkCreateProjects, ProjectView, ReactAppView, generate_pdf, UpdateProjectView
 from . import views
-from .views import project_list_view, current_user
+from .views import project_list_view, current_user, logout_view
 from .views import BulkCreateUsers
+from .views import CedulaRegistroListCreateView, CedulaRegistroDetailUpdateDeleteView
 
 
 urlpatterns = [
@@ -39,11 +40,17 @@ urlpatterns = [
     # API URL to get the current user
     path('api/current_user/', current_user, name='current_user'),
 
+    path('api/logout/', logout_view, name='logout'),
+
     # Template views
     path('login/', ReactAppView.as_view(), name='login'),
     path('table/', ReactAppView.as_view(), name='table'),
     path('panel-usuario/', ReactAppView.as_view(), name='panel-usuario'),
     path('consulta/', ReactAppView.as_view(), name='consulta'),
+
+    # cedulas
+    path('cedulas/', CedulaRegistroListCreateView.as_view(), name='cedula-list-create'),
+    path('cedulas/<int:pk>/', CedulaRegistroDetailUpdateDeleteView.as_view(), name='cedula-detail-update-delete'),
 
     # Para todas las demás rutas, redirige a la vista de React
     re_path(r'^(?!admin|inicio-sesion|guardar-proyecto|masivacarga|ver-proyectos-tabla|proyecto|api|static).*$',

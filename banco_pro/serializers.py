@@ -46,3 +46,10 @@ class BulkCreateProjectSerializer(serializers.ModelSerializer):
             'longitud': {'required': False, 'allow_null': True},
         }
 
+from rest_framework import serializers
+from .models import CedulaRegistro
+
+class CedulaRegistroSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CedulaRegistro
+        fields = '__all__'

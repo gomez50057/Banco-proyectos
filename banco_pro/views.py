@@ -270,16 +270,32 @@ class UpdateProjectView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# Django view para cerrar sesión
+from django.contrib.auth import logout
+
+@csrf_exempt
+def logout_view(request):
+    if request.method == 'POST':
+        logout(request)
+        return JsonResponse({'message': 'Sesión cerrada con éxito'}, status=200)
+    else:
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 
 
+from rest_framework import generics
+from .models import CedulaRegistro
+from .serializers import CedulaRegistroSerializer
 
+# Vista para listar y crear registros
+class CedulaRegistroListCreateView(generics.ListCreateAPIView):
+    queryset = CedulaRegistro.objects.all()
+    serializer_class = CedulaRegistroSerializer
 
-
-
-
-
-
+# Vista para obtener, actualizar y eliminar un registro específico
+class CedulaRegistroDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = CedulaRegistro.objects.all()
+    serializer_class = CedulaRegistroSerializer
 
 
 

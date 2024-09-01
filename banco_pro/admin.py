@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import FormProject
+from .models import CedulaRegistro
 
 # Elimina el registro duplicado si existe
 try:
@@ -20,3 +21,5 @@ class FormProjectAdmin(admin.ModelAdmin):
         return formfield
 
 admin.site.register(FormProject, FormProjectAdmin)
+
+admin.site.register(CedulaRegistro)

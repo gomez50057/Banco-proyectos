@@ -205,3 +205,38 @@ class FormProject(models.Model):
 
     def __str__(self):
         return self.project_name
+
+
+from django.db import models
+
+class CedulaRegistro(models.Model):
+    # Campos básicos
+    fecha_actual = models.DateField(auto_now_add=True)
+    ejercicio_fiscal = models.CharField(max_length=4, choices=[('2020', '2020'), ('2021', '2021'), ('2022', '2022'), ('2023', '2023'), ('2024', '2024'), ('2025', '2025')])
+    
+    # Relación con dependencias y organismos
+    dependencia = models.CharField(max_length=255)
+    organismo = models.CharField(max_length=255)
+    
+    # Relación con unidades y objetivos
+    unidad_responsable = models.CharField(max_length=255)
+    unidad_presupuestal = models.CharField(max_length=255)
+    
+    # Información del proyecto
+    nombre_proyecto = models.CharField(max_length=250)
+    descripcion_proyecto = models.TextField(max_length=1000)
+    
+    # Estructura financiera
+    inversion_presupuestada = models.DecimalField(max_digits=12, decimal_places=2)
+    
+    # Alineación PED
+    acuerdo_aplicable = models.CharField(max_length=255)
+    objetivo = models.CharField(max_length=255)
+    
+    # Verificación de propuesta
+    prioridad = models.CharField(max_length=10, choices=[('Alta', 'Alta'), ('Media', 'Media'), ('Baja', 'Baja')])
+    propuesta_campaña = models.BooleanField(choices=[(True, 'Sí'), (False, 'No')], default=False)
+    expediente_tecnico = models.BooleanField(choices=[(True, 'Sí'), (False, 'No')], default=False)
+    
+    def __str__(self):
+        return self.nombre_proyecto
