@@ -210,36 +210,65 @@ class FormProject(models.Model):
 from django.db import models
 
 class CedulaRegistro(models.Model):
-    # Campos básicos
-    fecha_actual = models.DateField(auto_now_add=True)
-    ejercicio_fiscal = models.CharField(max_length=4, choices=[('2020', '2020'), ('2021', '2021'), ('2022', '2022'), ('2023', '2023'), ('2024', '2024'), ('2025', '2025')])
-    
-    # Relación con dependencias y organismos
-    dependencia = models.CharField(max_length=255)
-    organismo = models.CharField(max_length=255)
-    
-    # Relación con unidades y objetivos
-    unidad_responsable = models.CharField(max_length=255)
-    unidad_presupuestal = models.CharField(max_length=255)
-    
-    # Información del proyecto
-    nombre_proyecto = models.CharField(max_length=250)
-    descripcion_proyecto = models.TextField(max_length=1000)
-    
-    # Estructura financiera
-    inversion_presupuestada = models.DecimalField(max_digits=12, decimal_places=2)
-    
-    # Alineación PED
-    acuerdo_aplicable = models.CharField(max_length=255)
-    objetivo = models.CharField(max_length=255)
-    
-    # Verificación de propuesta
-    prioridad = models.CharField(max_length=10, choices=[('Alta', 'Alta'), ('Media', 'Media'), ('Baja', 'Baja')])
-    propuesta_campaña = models.BooleanField(choices=[(True, 'Sí'), (False, 'No')], default=False)
-    expediente_tecnico = models.BooleanField(choices=[(True, 'Sí'), (False, 'No')], default=False)
-    
+    # Información del responsable del proyecto
+    nombre_dependencia = models.CharField(max_length=255, blank=True, null=True)
+    area_adscripcion = models.CharField(max_length=255, blank=True, null=True)
+    nombre_registrante = models.CharField(max_length=255, blank=True, null=True)
+    apellido_paterno = models.CharField(max_length=255, blank=True, null=True)
+    apellido_materno = models.CharField(max_length=255, blank=True, null=True)
+    correo = models.EmailField(blank=True, null=True)
+    telefono = models.CharField(max_length=10, blank=True, null=True)
+    extension = models.CharField(max_length=10, blank=True, null=True)
+
+    # Datos generales del proyecto
+    fecha_registro = models.DateField(auto_now_add=True)
+    ejercicio_fiscal = models.CharField(max_length=4, blank=True, null=True)
+    dependencia = models.CharField(max_length=255, blank=True, null=True)
+    organismo = models.CharField(max_length=255, blank=True, null=True)
+    unidad_responsable = models.CharField(max_length=255, blank=True, null=True)
+    unidad_presupuestal = models.CharField(max_length=255, blank=True, null=True)
+    nombre_proyecto = models.CharField(max_length=250, blank=True, null=True)
+    descripcion_proyecto = models.TextField(max_length=1000, blank=True, null=True)
+    situacion_actual = models.TextField(max_length=1000, blank=True, null=True)
+    tipo_obra = models.CharField(max_length=50, blank=True, null=True)
+    calendario_ejecucion = models.CharField(max_length=50, blank=True, null=True)
+    beneficio_social = models.TextField(max_length=500, blank=True, null=True)
+    beneficio_economico = models.TextField(max_length=500, blank=True, null=True)
+    numero_beneficiarios = models.IntegerField(blank=True, null=True)
+    inversion_presupuestada = models.DecimalField(max_digits=15, decimal_places=2, blank=True, null=True)
+
+    # Cobertura del proyecto
+    cobertura = models.CharField(max_length=50, choices=[('Federal', 'Federal'), ('Regional', 'Regional'), ('Municipal', 'Municipal')], blank=True, null=True)
+    regiones = models.JSONField(blank=True, null=True)
+    municipios = models.JSONField(blank=True, null=True)
+
+    # Alineación estratégica
+    ods = models.CharField(max_length=255, blank=True, null=True)
+    plan_estatal = models.CharField(max_length=255, blank=True, null=True)
+    objetivo_ped = models.CharField(max_length=255, blank=True, null=True)
+    estrategia_ped = models.CharField(max_length=255, blank=True, null=True)
+    linea_accion_ped = models.CharField(max_length=255, blank=True, null=True)
+    indicador_ped = models.CharField(max_length=255, blank=True, null=True)
+    prioridad = models.IntegerField(blank=True, null=True)
+    propuesta_campana = models.CharField(max_length=50, blank=True, null=True)
+    cual_propuesta = models.CharField(max_length=255, blank=True, null=True)
+    expediente_tecnico = models.CharField(max_length=50, blank=True, null=True)
+
+    # Campos de anexos
+    estudios_prospectivos = models.FileField(upload_to='anteProInv/estudios/prospectivos/', blank=True, null=True)
+    estudios_factibilidad = models.FileField(upload_to='anteProInv/estudios/factibilidad/', blank=True, null=True)
+    analisis_alternativas = models.FileField(upload_to='anteProInv/analisis/alternativas/', blank=True, null=True)
+    validacion_normativa = models.FileField(upload_to='anteProInv/validacion/normativa/', blank=True, null=True)
+    liberacion_derecho_via = models.FileField(upload_to='anteProInv/liberacion/derecho_via/', blank=True, null=True)
+    situacion_sin_proyecto_fotografico = models.FileField(upload_to='anteProInv/situacion/sin_proyecto/fotografico/', blank=True, null=True)
+    situacion_con_proyecto_proyeccion = models.FileField(upload_to='anteProInv/situacion/con_proyecto/proyeccion/', blank=True, null=True)
+    analisis_costo_beneficio = models.FileField(upload_to='anteProInv/analisis/costo_beneficio/', blank=True, null=True)
+    proyecto_ejecutivo = models.FileField(upload_to='anteProInv/proyecto/ejecutivo/', blank=True, null=True)
+    manifestacion_impacto_ambiental = models.FileField(upload_to='anteProInv/manifestacion/impacto_ambiental/', blank=True, null=True)
+    otros_estudios = models.FileField(upload_to='anteProInv/otros/estudios/', blank=True, null=True)
+
     # Campos de bloqueo
     isBlocked_project = models.BooleanField(default=True)
-    
+
     def __str__(self):
-        return self.nombre_proyecto
+        return self.nombre_proyecto or "Proyecto sin nombre"
