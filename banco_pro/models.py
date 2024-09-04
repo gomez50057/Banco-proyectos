@@ -238,5 +238,8 @@ class CedulaRegistro(models.Model):
     propuesta_campaña = models.BooleanField(choices=[(True, 'Sí'), (False, 'No')], default=False)
     expediente_tecnico = models.BooleanField(choices=[(True, 'Sí'), (False, 'No')], default=False)
     
+    # Campos de bloqueo
+    isBlocked_project = models.BooleanField(default=True)
+    
     def __str__(self):
         return self.nombre_proyecto
