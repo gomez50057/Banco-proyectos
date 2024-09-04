@@ -221,7 +221,7 @@ class CedulaRegistro(models.Model):
     extension = models.CharField(max_length=10, blank=True, null=True)
 
     # Datos generales del proyecto
-    fecha_registro = models.DateField(auto_now_add=True)
+    fecha_registro = models.DateField(blank=True, null=True)  # Cambiado para permitir valores personalizados
     ejercicio_fiscal = models.CharField(max_length=4, blank=True, null=True)
     dependencia = models.CharField(max_length=255, blank=True, null=True)
     organismo = models.CharField(max_length=255, blank=True, null=True)
@@ -249,6 +249,8 @@ class CedulaRegistro(models.Model):
     estrategia_ped = models.CharField(max_length=255, blank=True, null=True)
     linea_accion_ped = models.CharField(max_length=255, blank=True, null=True)
     indicador_ped = models.CharField(max_length=255, blank=True, null=True)
+    programa_sectorial = models.CharField(max_length=255, blank=True, null=True)
+    objetivo_programa = models.CharField(max_length=255, blank=True, null=True)
     propuesta_campana = models.CharField(max_length=50, blank=True, null=True)
     cual_propuesta = models.CharField(max_length=255, blank=True, null=True)
     expediente_tecnico = models.CharField(max_length=50, blank=True, null=True)
@@ -259,14 +261,14 @@ class CedulaRegistro(models.Model):
     validacion_normativa = models.FileField(upload_to='anteProInv/validacion/normativa/', blank=True, null=True)
     liberacion_derecho_via = models.FileField(upload_to='anteProInv/liberacion/derecho_via/', blank=True, null=True)
     analisis_costo_beneficio = models.FileField(upload_to='anteProInv/analisis/costo_beneficio/', blank=True, null=True)
-    expediente_Tecnico_Docu = models.FileField(upload_to='anteProInv/expediente/tecnico/', blank=True, null=True)
+    expediente_tecnico_docu = models.FileField(upload_to='anteProInv/expediente/tecnico/', blank=True, null=True)
     proyecto_ejecutivo = models.FileField(upload_to='anteProInv/proyecto/ejecutivo/', blank=True, null=True)
     manifestacion_impacto_ambiental = models.FileField(upload_to='anteProInv/manifestacion/impacto_ambiental/', blank=True, null=True)
-    Fotografia_Proyecto = models.FileField(upload_to='anteProInv/fotos/', blank=True, null=True)
+    fotografia_render_proyecto = models.FileField(upload_to='anteProInv/fotos/', blank=True, null=True)
     otros_estudios = models.FileField(upload_to='anteProInv/otros/estudios/', blank=True, null=True)
 
     # Campos de bloqueo
-    isBlocked_project = models.BooleanField(default=True)
+    is_blocked_project = models.BooleanField(default=True)
 
     def __str__(self):
         return self.nombre_proyecto or "Proyecto sin nombre"
