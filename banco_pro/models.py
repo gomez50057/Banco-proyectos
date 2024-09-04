@@ -238,7 +238,7 @@ class CedulaRegistro(models.Model):
     inversion_presupuestada = models.DecimalField(max_digits=15, decimal_places=2, blank=True, null=True)
 
     # Cobertura del proyecto
-    cobertura = models.CharField(max_length=50, choices=[('Federal', 'Federal'), ('Regional', 'Regional'), ('Municipal', 'Municipal')], blank=True, null=True)
+    cobertura = models.CharField(max_length=50, choices=[('Estatal', 'Estatal'), ('Regional', 'Regional'), ('Municipal', 'Municipal')], blank=True, null=True)
     regiones = models.JSONField(blank=True, null=True)
     municipios = models.JSONField(blank=True, null=True)
 
@@ -249,22 +249,20 @@ class CedulaRegistro(models.Model):
     estrategia_ped = models.CharField(max_length=255, blank=True, null=True)
     linea_accion_ped = models.CharField(max_length=255, blank=True, null=True)
     indicador_ped = models.CharField(max_length=255, blank=True, null=True)
-    prioridad = models.IntegerField(blank=True, null=True)
     propuesta_campana = models.CharField(max_length=50, blank=True, null=True)
     cual_propuesta = models.CharField(max_length=255, blank=True, null=True)
     expediente_tecnico = models.CharField(max_length=50, blank=True, null=True)
 
     # Campos de anexos
-    estudios_prospectivos = models.FileField(upload_to='anteProInv/estudios/prospectivos/', blank=True, null=True)
     estudios_factibilidad = models.FileField(upload_to='anteProInv/estudios/factibilidad/', blank=True, null=True)
     analisis_alternativas = models.FileField(upload_to='anteProInv/analisis/alternativas/', blank=True, null=True)
     validacion_normativa = models.FileField(upload_to='anteProInv/validacion/normativa/', blank=True, null=True)
     liberacion_derecho_via = models.FileField(upload_to='anteProInv/liberacion/derecho_via/', blank=True, null=True)
-    situacion_sin_proyecto_fotografico = models.FileField(upload_to='anteProInv/situacion/sin_proyecto/fotografico/', blank=True, null=True)
-    situacion_con_proyecto_proyeccion = models.FileField(upload_to='anteProInv/situacion/con_proyecto/proyeccion/', blank=True, null=True)
     analisis_costo_beneficio = models.FileField(upload_to='anteProInv/analisis/costo_beneficio/', blank=True, null=True)
+    expediente_Tecnico_Docu = models.FileField(upload_to='anteProInv/expediente/tecnico/', blank=True, null=True)
     proyecto_ejecutivo = models.FileField(upload_to='anteProInv/proyecto/ejecutivo/', blank=True, null=True)
     manifestacion_impacto_ambiental = models.FileField(upload_to='anteProInv/manifestacion/impacto_ambiental/', blank=True, null=True)
+    Fotografia_Proyecto = models.FileField(upload_to='anteProInv/fotos/', blank=True, null=True)
     otros_estudios = models.FileField(upload_to='anteProInv/otros/estudios/', blank=True, null=True)
 
     # Campos de bloqueo
