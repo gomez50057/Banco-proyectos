@@ -287,15 +287,47 @@ from rest_framework import generics
 from .models import CedulaRegistro
 from .serializers import CedulaRegistroSerializer
 
-# Vista para listar y crear registros
+from rest_framework import generics
+from .models import CedulaRegistro
+from .serializers import CedulaRegistroSerializer
+from .utils import generate_proj_investment_id  # Importa la función utilitaria
+from rest_framework import status
+from rest_framework.response import Response
+from datetime import datetime
+
 class CedulaRegistroListCreateView(generics.ListCreateAPIView):
     queryset = CedulaRegistro.objects.all()
     serializer_class = CedulaRegistroSerializer
+
+    def perform_create(self, serializer):
+        # Obtener los datos necesarios para generar el ID
+        unidad_responsable = serializer.validated_data.get('unidad_responsable')
+        fecha_registro = serializer.validated_data.get('fecha_registro', datetime.now().date())
+
+        # Generar el ID
+        proj_investment_id = generate_proj_investment_id(unidad_responsable, fecha_registro)
+
+        # Guardar el registro con el ID generado
+        serializer.save(projInvestment_id=proj_investment_id)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # Llamar a perform_create para generar y guardar el ID
+        self.perform_create(serializer)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
 
 # Vista para obtener, actualizar y eliminar un registro específico
 class CedulaRegistroDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = CedulaRegistro.objects.all()
     serializer_class = CedulaRegistroSerializer
+
+
+
 
 
 

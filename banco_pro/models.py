@@ -210,6 +210,9 @@ class FormProject(models.Model):
 from django.db import models
 
 class CedulaRegistro(models.Model):
+    # ID de proyecto
+    projInvestment_id = models.CharField(max_length=20, unique=True, blank=True, null=True)
+
     # Información del responsable del proyecto
     nombre_dependencia = models.CharField(max_length=255, blank=True, null=True)
     area_adscripcion = models.CharField(max_length=255, blank=True, null=True)
