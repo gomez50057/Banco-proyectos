@@ -329,7 +329,21 @@ class CedulaRegistroDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView
 
 
 
+from django.contrib.sessions.models import Session
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
 
+@staff_member_required
+def logout_all_users(request):
+    # Eliminar todas las sesiones activas
+    Session.objects.all().delete()
+    
+    # Opcionalmente, puedes mostrar un mensaje de éxito
+    messages.success(request, "Se ha cerrado la sesión de todos los usuarios.")
+    
+    # Redirigir a alguna página (por ejemplo, al panel de administración o inicio)
+    return redirect('admin:index')
 
 
 # from reportlab.lib.pagesizes import letter

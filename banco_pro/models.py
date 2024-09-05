@@ -256,6 +256,7 @@ class CedulaRegistro(models.Model):
     objetivo_programa = models.CharField(max_length=255, blank=True, null=True)
     propuesta_campana = models.CharField(max_length=50, blank=True, null=True)
     cual_propuesta = models.CharField(max_length=255, blank=True, null=True)
+    prioridad = models.CharField(max_length=255, blank=True, null=True)
     expediente_tecnico = models.CharField(max_length=50, blank=True, null=True)
 
     # Campos de anexos

@@ -52,6 +52,8 @@ urlpatterns = [
     path('cedulas/', CedulaRegistroListCreateView.as_view(), name='cedula-list-create'),
     path('cedulas/<int:pk>/', CedulaRegistroDetailUpdateDeleteView.as_view(), name='cedula-detail-update-delete'),
 
+    path('logout-all/', views.logout_all_users, name='logout_all_users'),
+
     # Para todas las demás rutas, redirige a la vista de React
     re_path(r'^(?!admin|inicio-sesion|guardar-proyecto|masivacarga|ver-proyectos-tabla|proyecto|api|static).*$',
             ReactAppView.as_view(), name='react-app'),
