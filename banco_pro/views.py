@@ -302,7 +302,7 @@ class CedulaRegistroListCreateView(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         # Obtener los datos necesarios para generar el ID
         unidad_responsable = serializer.validated_data.get('unidad_responsable')
-        fecha_registro = serializer.validated_data.get('fecha_registro', datetime.now().date())
+        fecha_registro = serializer.validated_data.get('fecha_registro') or datetime.now().date()
 
         # Generar el ID
         proj_investment_id = generate_proj_investment_id(unidad_responsable, fecha_registro)
