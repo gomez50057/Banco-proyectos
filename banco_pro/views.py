@@ -295,9 +295,13 @@ from rest_framework import status
 from rest_framework.response import Response
 from datetime import datetime
 
+
+# Vista para listar y crear CedulaRegistro
 class CedulaRegistroListCreateView(generics.ListCreateAPIView):
     queryset = CedulaRegistro.objects.all()
     serializer_class = CedulaRegistroSerializer
+    lookup_field = 'projInvestment_id'  # Usar este campo en lugar de pk
+
 
     def perform_create(self, serializer):
         # Obtener los datos necesarios para generar el ID
@@ -325,6 +329,10 @@ class CedulaRegistroListCreateView(generics.ListCreateAPIView):
 class CedulaRegistroDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = CedulaRegistro.objects.all()
     serializer_class = CedulaRegistroSerializer
+
+    def get_object(self):
+        projInvestment_id = self.kwargs['projInvestment_id']
+        return get_object_or_404(CedulaRegistro, projInvestment_id=projInvestment_id)
 
 
 
