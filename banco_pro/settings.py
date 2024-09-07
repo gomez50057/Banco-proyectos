@@ -118,12 +118,11 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
-    ],
 }
 
+#Capacidad Max de envio
+#Aparte de Django, es necesario ajustar la configuración en el servidor (Nginx)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 300 * 1024 * 1024  # 300 MB
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
