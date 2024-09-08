@@ -207,8 +207,6 @@ class FormProject(models.Model):
         return self.project_name
 
 
-from django.db import models
-
 class CedulaRegistro(models.Model):
     # ID de proyecto
     projInvestment_id = models.CharField(max_length=20, unique=True, blank=True, null=True)
@@ -224,7 +222,7 @@ class CedulaRegistro(models.Model):
     extension = models.CharField(max_length=10, blank=True, null=True)
 
     # Datos generales del proyecto
-    fecha_registro = models.DateField(blank=True, null=True)  # Cambiado para permitir valores personalizados
+    fecha_registro = models.DateField(blank=True, null=True)
     ejercicio_fiscal = models.CharField(max_length=4, blank=True, null=True)
     dependencia = models.CharField(max_length=255, blank=True, null=True)
     organismo = models.CharField(max_length=255, blank=True, null=True)
