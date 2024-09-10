@@ -239,6 +239,9 @@ class AnexoProyecto(models.Model):
         return f"{self.get_tipo_anexo_display()} - {self.archivo.name}"
 
 class CedulaRegistro(models.Model):
+    # Agrega el campo para guardar el usuario que envió el formulario
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
     # ID de proyecto
     projInvestment_id = models.CharField(max_length=20, unique=True, blank=True, null=True)
 

@@ -308,14 +308,14 @@ class CedulaRegistroListCreateView(generics.ListCreateAPIView):
         unidad_responsable = serializer.validated_data.get('unidad_responsable')
         fecha_registro = serializer.validated_data.get('fecha_registro') or datetime.now().date()
 
-        # Generar el ID
+        # Generar el ID del proyecto
         proj_investment_id = generate_proj_investment_id(unidad_responsable, fecha_registro)
 
-        # Guardar el registro con el ID generado
-        cedula_registro = serializer.save(projInvestment_id=proj_investment_id)
+        # Guardar el registro con el ID generado, asignando el usuario autenticado
+        cedula_registro = serializer.save(projInvestment_id=proj_investment_id, user=self.request.user)
 
         # Procesar la carga de múltiples archivos para los anexos
-        self.save_anexos(self.request.FILES, cedula_registro)  # Asegúrate de pasar self.request.FILES correctamente
+        self.save_anexos(self.request.FILES, cedula_registro)
 
     def save_anexos(self, files, cedula_registro):
         # Aquí procesamos los archivos adjuntos
