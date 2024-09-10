@@ -298,7 +298,6 @@ from datetime import datetime
 from .models import AnexoProyecto, CedulaRegistro
 
 # Vista para listar y crear CedulaRegistro
-# Vista para listar y crear CedulaRegistro
 class CedulaRegistroListCreateView(generics.ListCreateAPIView):
     queryset = CedulaRegistro.objects.all()
     serializer_class = CedulaRegistroSerializer
