@@ -298,10 +298,23 @@ from datetime import datetime
 from .models import AnexoProyecto, CedulaRegistro
 
 # Vista para listar y crear CedulaRegistro
+# Vista para listar y crear CedulaRegistro
 class CedulaRegistroListCreateView(generics.ListCreateAPIView):
     queryset = CedulaRegistro.objects.all()
     serializer_class = CedulaRegistroSerializer
     lookup_field = 'projInvestment_id'
+
+    def get_queryset(self):
+        """
+        Sobrescribimos get_queryset para permitir el filtrado opcional por usuario.
+        """
+        queryset = super().get_queryset()
+
+        # Si el usuario está autenticado y no es staff o admin, filtrar por el usuario
+        if self.request.user.is_authenticated and not self.request.user.is_staff:
+            queryset = queryset.filter(user=self.request.user)
+
+        return queryset
 
     def perform_create(self, serializer):
         # Obtener los datos necesarios para generar el ID
