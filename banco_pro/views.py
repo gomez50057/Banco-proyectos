@@ -295,13 +295,13 @@ from rest_framework import status
 from rest_framework.response import Response
 from datetime import datetime
 
+from .models import AnexoProyecto, CedulaRegistro
 
 # Vista para listar y crear CedulaRegistro
 class CedulaRegistroListCreateView(generics.ListCreateAPIView):
     queryset = CedulaRegistro.objects.all()
     serializer_class = CedulaRegistroSerializer
-    lookup_field = 'projInvestment_id'  # Usar este campo en lugar de pk
-
+    lookup_field = 'projInvestment_id'
 
     def perform_create(self, serializer):
         # Obtener los datos necesarios para generar el ID
@@ -312,7 +312,16 @@ class CedulaRegistroListCreateView(generics.ListCreateAPIView):
         proj_investment_id = generate_proj_investment_id(unidad_responsable, fecha_registro)
 
         # Guardar el registro con el ID generado
-        serializer.save(projInvestment_id=proj_investment_id)
+        cedula_registro = serializer.save(projInvestment_id=proj_investment_id)
+
+        # Procesar la carga de múltiples archivos para los anexos
+        self.save_anexos(self.request.FILES, cedula_registro)  # Asegúrate de pasar self.request.FILES correctamente
+
+    def save_anexos(self, files, cedula_registro):
+        # Aquí procesamos los archivos adjuntos
+        for file_key in files:
+            for file in files.getlist(file_key):
+                AnexoProyecto.objects.create(cedula=cedula_registro, archivo=file, tipo_anexo=file_key)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -324,7 +333,6 @@ class CedulaRegistroListCreateView(generics.ListCreateAPIView):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
-
 # Vista para obtener, actualizar y eliminar un registro específico
 class CedulaRegistroDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = CedulaRegistro.objects.all()
@@ -333,6 +341,34 @@ class CedulaRegistroDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView
     def get_object(self):
         projInvestment_id = self.kwargs['projInvestment_id']
         return get_object_or_404(CedulaRegistro, projInvestment_id=projInvestment_id)
+
+    def perform_update(self, serializer):
+        # Actualizar la cédula existente
+        cedula_registro = serializer.save()
+
+        # Procesar la carga de nuevos archivos en caso de que se actualicen
+        self.save_anexos(self.request.FILES, cedula_registro)
+
+    def save_anexos(self, files, cedula_registro):
+        """
+        Función para manejar la actualización de anexos.
+        """
+        anexo_fields = [
+            'estudios_factibilidad', 'analisis_alternativas', 'validacion_normativa',
+            'liberacion_derecho_via', 'analisis_costo_beneficio', 'expediente_tecnico_docu',
+            'proyecto_ejecutivo', 'manifestacion_impacto_ambiental', 'fotografia_render_proyecto',
+            'otros_estudios'
+        ]
+
+        for field in anexo_fields:
+            if field in files:
+                for file in files.getlist(field):
+                    # Crear nuevos anexos asociados a la cédula
+                    AnexoProyecto.objects.create(
+                        cedula=cedula_registro,
+                        tipo_anexo=field,
+                        archivo=file
+                    )
 
 
 

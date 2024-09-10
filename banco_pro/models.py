@@ -1,6 +1,8 @@
 # models.py
 from django.db import models
 from django.contrib.auth.models import User
+import os
+
 
 class FormProject(models.Model):
     nombre_dependencia = models.CharField(max_length=255, null=True, blank=True, default="")
@@ -206,6 +208,35 @@ class FormProject(models.Model):
     def __str__(self):
         return self.project_name
 
+def custom_upload_to(instance, filename):
+    # Obtener el ID del proyecto y el tipo de anexo
+    project_id = instance.cedula.projInvestment_id  # Se obtiene de la relación ForeignKey
+    tipo_anexo = instance.get_tipo_anexo_display()  # Mostrar la representación legible del tipo de anexo
+    
+    # Construir la ruta: 'Documents/investmentform2025/projInvestment_id/tipo_anexo/'
+    return os.path.join('Documents', 'investmentform2025', project_id, tipo_anexo, filename)
+
+class AnexoProyecto(models.Model):
+    TIPOS_ANEXO = [
+        ('estudios_factibilidad', 'Estudios de Factibilidad'),
+        ('analisis_alternativas', 'Análisis de Alternativas'),
+        ('validacion_normativa', 'Validación Normativa'),
+        ('liberacion_derecho_via', 'Liberación de Derecho de Vía'),
+        ('analisis_costo_beneficio', 'Análisis Costo-Beneficio'),
+        ('expediente_tecnico_docu', 'Expediente Técnico'),
+        ('proyecto_ejecutivo', 'Proyecto Ejecutivo'),
+        ('manifestacion_impacto_ambiental', 'Manifestación de Impacto Ambiental'),
+        ('fotografia_render_proyecto', 'Fotografía Render del Proyecto'),
+        ('otros_estudios', 'Otros Estudios'),
+    ]
+
+    cedula = models.ForeignKey('CedulaRegistro', related_name='anexos_proyectos', on_delete=models.CASCADE)
+    tipo_anexo = models.CharField(max_length=50, choices=TIPOS_ANEXO, default='otros_estudios')
+    archivo = models.FileField(upload_to=custom_upload_to)  # Usa la función personalizada para guardar el archivo
+    descripcion = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.get_tipo_anexo_display()} - {self.archivo.name}"
 
 class CedulaRegistro(models.Model):
     # ID de proyecto
@@ -257,17 +288,8 @@ class CedulaRegistro(models.Model):
     prioridad = models.CharField(max_length=255, blank=True, null=True)
     expediente_tecnico = models.CharField(max_length=50, blank=True, null=True)
 
-    # Campos de anexos
-    estudios_factibilidad = models.FileField(upload_to='formsDocuments/anteProInv/estudios/factibilidad/', blank=True, null=True)
-    analisis_alternativas = models.FileField(upload_to='formsDocuments/anteProInv/analisis/alternativas/', blank=True, null=True)
-    validacion_normativa = models.FileField(upload_to='formsDocuments/anteProInv/validacion/normativa/', blank=True, null=True)
-    liberacion_derecho_via = models.FileField(upload_to='formsDocuments/anteProInv/liberacion/derecho_via/', blank=True, null=True)
-    analisis_costo_beneficio = models.FileField(upload_to='formsDocuments/anteProInv/analisis/costo_beneficio/', blank=True, null=True)
-    expediente_tecnico_docu = models.FileField(upload_to='formsDocuments/anteProInv/expediente/tecnico/', blank=True, null=True)
-    proyecto_ejecutivo = models.FileField(upload_to='formsDocuments/anteProInv/proyecto/ejecutivo/', blank=True, null=True)
-    manifestacion_impacto_ambiental = models.FileField(upload_to='formsDocuments/anteProInv/manifestacion/impacto_ambiental/', blank=True, null=True)
-    fotografia_render_proyecto = models.FileField(upload_to='formsDocuments/anteProInv/fotos/', blank=True, null=True)
-    otros_estudios = models.FileField(upload_to='formsDocuments/anteProInv/otros/estudios/', blank=True, null=True)
+    # Relación con anexos (múltiples tipos de archivos para cada anexo)
+    anexos = models.ManyToManyField(AnexoProyecto, related_name='cedulas', blank=True)
 
     # Campos de bloqueo
     is_blocked_project = models.BooleanField(default=True)
