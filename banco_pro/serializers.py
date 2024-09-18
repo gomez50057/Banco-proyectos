@@ -54,7 +54,8 @@ class AnexoProyectoSerializer(serializers.ModelSerializer):
         fields = ['id', 'nombre_anexo', 'archivo', 'descripcion']
 
 class CedulaRegistroSerializer(serializers.ModelSerializer):
-    anexos = AnexoProyectoSerializer(many=True, required=False)
+    anexos = AnexoProyectoSerializer(many=True, required=False)  # Mantiene los anexos
+    username = serializers.CharField(source='user.username', read_only=True)  # Añade el username del usuario
 
     class Meta:
         model = CedulaRegistro

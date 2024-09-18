@@ -299,7 +299,7 @@ from .models import AnexoProyecto, CedulaRegistro
 
 # Vista para listar y crear CedulaRegistro
 class CedulaRegistroListCreateView(generics.ListCreateAPIView):
-    queryset = CedulaRegistro.objects.all()
+    queryset = CedulaRegistro.objects.select_related('user').all()  # Utilizamos select_related para traer el user
     serializer_class = CedulaRegistroSerializer
     lookup_field = 'projInvestment_id'
 
