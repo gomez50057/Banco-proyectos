@@ -8,6 +8,11 @@ from . import views
 from .views import project_list_view, current_user, logout_view
 from .views import BulkCreateUsers
 from .views import CedulaRegistroListCreateView, CedulaRegistroDetailUpdateDeleteView
+from .views import refresh_csrf_token
+from . import views
+from .views import ProjectIdListView  
+
+
 
 
 urlpatterns = [
@@ -51,6 +56,16 @@ urlpatterns = [
     # cedulas
     path('cedulas/', CedulaRegistroListCreateView.as_view(), name='cedula-list-create'),
     path('cedulas/<str:projInvestment_id>/', CedulaRegistroDetailUpdateDeleteView.as_view(), name='cedula-detail-update-delete'),
+
+    path('api/csrf-token/', refresh_csrf_token, name='refresh_csrf_token'),
+    path('api/proyectos_totales/', views.proyectos_totales, name='proyectos_totales'),
+    path('api/proyectos_por_unidad_responsable/', views.proyectos_por_unidad_responsable, name='proyectos_por_unidad_responsable'),
+    path('api/proyectos_por_usuario/', views.proyectos_por_usuario, name='proyectos_por_usuario'),
+    path('api/propuesta_campana/', views.propuesta_campana, name='propuesta_campana'),
+    path('api/cual_propuesta/', views.cual_propuesta, name='cual_propuesta'),
+    path('api/cobertura_proyecto/', views.cobertura_proyecto, name='cobertura_proyecto'),
+    path('api/proj-ids/', ProjectIdListView.as_view(), name='project_id_list'),  # Para la vista basada en clases
+
 
     # Para todas las demás rutas, redirige a la vista de React
     re_path(r'^(?!admin|inicio-sesion|guardar-proyecto|masivacarga|ver-proyectos-tabla|proyecto|api|static).*$',

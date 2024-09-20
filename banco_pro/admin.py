@@ -22,4 +22,14 @@ class FormProjectAdmin(admin.ModelAdmin):
 
 admin.site.register(FormProject, FormProjectAdmin)
 
-admin.site.register(CedulaRegistro)
+class CedulaRegistroAdmin(admin.ModelAdmin):
+    list_display = ('projInvestment_id', 'user', 'nombre_proyecto', 'dependencia', 'organismo', 'unidad_responsable', 'fecha_registro', 'ejercicio_fiscal')
+
+    # Añadir filtros por algunos de los campos
+    list_filter = ('user__username' ,'unidad_responsable', 'dependencia', 'organismo', 'ejercicio_fiscal')
+
+    # Hacer que algunos campos se puedan buscar
+    search_fields = ('nombre_proyecto', 'projInvestment_id',)
+
+# Registrar el modelo con el administrador personalizado
+admin.site.register(CedulaRegistro, CedulaRegistroAdmin)

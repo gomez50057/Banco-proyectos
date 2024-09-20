@@ -297,6 +297,14 @@ from datetime import datetime
 
 from .models import AnexoProyecto, CedulaRegistro
 
+
+
+
+@csrf_exempt
+def refresh_csrf_token(request):
+    return JsonResponse({"csrfToken": request.META.get("CSRF_COOKIE")})
+
+
 # Vista para listar y crear CedulaRegistro
 class CedulaRegistroListCreateView(generics.ListCreateAPIView):
     queryset = CedulaRegistro.objects.select_related('user').all()  # Utilizamos select_related para traer el user
@@ -382,6 +390,63 @@ class CedulaRegistroDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView
                         archivo=file
                     )
 
+
+
+
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from django.db.models import Count
+from .models import CedulaRegistro
+
+@api_view(['GET'])
+def proyectos_totales(request):
+    total_proyectos = CedulaRegistro.objects.count()
+    return Response({'total_proyectos': total_proyectos}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def proyectos_por_unidad_responsable(request):
+    data = CedulaRegistro.objects.values('unidad_responsable').annotate(total=Count('unidad_responsable')).order_by('-total')
+    return Response(data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def proyectos_por_usuario(request):
+    data = CedulaRegistro.objects.values('user__username').annotate(total=Count('user')).order_by('-total')
+    return Response(data, status=status.HTTP_200_OK)
+
+from django.db.models import Q
+
+@api_view(['GET'])
+def propuesta_campana(request):
+    # Usamos Q para hacer una consulta insensible a mayúsculas/minúsculas y tildes
+    si_count = CedulaRegistro.objects.filter(Q(propuesta_campana__iexact='si') | Q(propuesta_campana__iexact='sí')).count()
+    no_count = CedulaRegistro.objects.filter(propuesta_campana__iexact='no').count()
+    return Response({'Si': si_count, 'No': no_count}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def cual_propuesta(request):
+    data = CedulaRegistro.objects.values('cual_propuesta').annotate(total=Count('cual_propuesta')).order_by('-total')
+    return Response(data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def cobertura_proyecto(request):
+    data = CedulaRegistro.objects.values('cobertura').annotate(total=Count('cobertura')).order_by('-total')
+    return Response(data, status=status.HTTP_200_OK)
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .models import CedulaRegistro  # Asegúrate de importar correctamente el modelo
+
+class ProjectIdListView(APIView):
+
+    def get(self, request, *args, **kwargs):
+        # Obtiene todos los projInvestment_id de la base de datos
+        project_ids = CedulaRegistro.objects.values_list('projInvestment_id', flat=True)
+
+        # Retorna la lista en formato JSON
+        return Response({'project_ids': list(project_ids)})
 
 
 

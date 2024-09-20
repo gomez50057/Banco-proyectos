@@ -124,6 +124,9 @@ REST_FRAMEWORK = {
 #Aparte de Django, es necesario ajustar la configuración en el servidor (Nginx)
 DATA_UPLOAD_MAX_MEMORY_SIZE = 300 * 1024 * 1024  # 300 MB
 
+# Configura el tiempo de vida del token CSRF, en segundos.
+CSRF_COOKIE_AGE = 4 * 3600  # 4 horas
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
