@@ -11,9 +11,7 @@ from .views import CedulaRegistroListCreateView, CedulaRegistroDetailUpdateDelet
 from .views import refresh_csrf_token
 from . import views
 from .views import ProjectIdListView  
-
-
-
+from .views import AnexosProyectoListView
 
 urlpatterns = [
     # Admin URL
@@ -47,11 +45,12 @@ urlpatterns = [
 
     path('api/logout/', logout_view, name='logout'),
 
-    # Template views
-    path('login/', ReactAppView.as_view(), name='login'),
-    path('table/', ReactAppView.as_view(), name='table'),
-    path('panel-usuario/', ReactAppView.as_view(), name='panel-usuario'),
-    path('consulta/', ReactAppView.as_view(), name='consulta'),
+    # Template views usando BrowserRouter
+    # path('login/', ReactAppView.as_view(), name='login'),
+    # path('table/', ReactAppView.as_view(), name='table'),
+    # path('panel-usuario/', ReactAppView.as_view(), name='panel-usuario'),
+    # path('consulta/', ReactAppView.as_view(), name='consulta'),
+    # path('reporte-inversion/161309240001/', ReactAppView.as_view(), name='reporte-inversion'),
 
     # cedulas
     path('cedulas/', CedulaRegistroListCreateView.as_view(), name='cedula-list-create'),
@@ -64,10 +63,12 @@ urlpatterns = [
     path('api/propuesta_campana/', views.propuesta_campana, name='propuesta_campana'),
     path('api/cual_propuesta/', views.cual_propuesta, name='cual_propuesta'),
     path('api/cobertura_proyecto/', views.cobertura_proyecto, name='cobertura_proyecto'),
-    path('api/proj-ids/', ProjectIdListView.as_view(), name='project_id_list'),  # Para la vista basada en clases
-
+    path('api/proj-ids/', ProjectIdListView.as_view(), name='project_id_list'), 
+    
+    path('todos-anexos/', AnexosProyectoListView.as_view(), name='todos-anexos'),    
+    path('cedulas/anexos/<projInvestment_id>/', AnexosProyectoListView.as_view(), name='anexos-proyecto'),
 
     # Para todas las demás rutas, redirige a la vista de React
-    re_path(r'^(?!admin|inicio-sesion|guardar-proyecto|masivacarga|ver-proyectos-tabla|proyecto|api|static).*$',
-            ReactAppView.as_view(), name='react-app'),
+    re_path(r'^(?!admin|api|static|media).*$',
+        ReactAppView.as_view(), name='react-app'),
 ]

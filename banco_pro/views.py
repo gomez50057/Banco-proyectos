@@ -20,6 +20,33 @@ from .serializers import FormProjectSerializer, BulkCreateProjectSerializer, For
 from .utils import siglas, sector_codes
 from django.views.generic import TemplateView
 
+
+from rest_framework import generics
+from .serializers import CedulaRegistroSerializer
+from .utils import generate_proj_investment_id  # Importa la función utilitaria
+from rest_framework import status
+from rest_framework.response import Response
+from datetime import datetime
+
+from .models import AnexoProyecto, CedulaRegistro
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from django.db.models import Count
+from .models import CedulaRegistro
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .models import CedulaRegistro  
+from django.shortcuts import get_object_or_404
+from .serializers import AnexoProyectoSerializer
+
+from django.contrib.sessions.models import Session
+from django.contrib import messages
+from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
+
 @csrf_exempt
 def inicio_sesion(request):
     if request.method == 'POST':
@@ -283,22 +310,6 @@ def logout_view(request):
 
 
 
-from rest_framework import generics
-from .models import CedulaRegistro
-from .serializers import CedulaRegistroSerializer
-
-from rest_framework import generics
-from .models import CedulaRegistro
-from .serializers import CedulaRegistroSerializer
-from .utils import generate_proj_investment_id  # Importa la función utilitaria
-from rest_framework import status
-from rest_framework.response import Response
-from datetime import datetime
-
-from .models import AnexoProyecto, CedulaRegistro
-
-
-
 
 @csrf_exempt
 def refresh_csrf_token(request):
@@ -392,14 +403,6 @@ class CedulaRegistroDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView
 
 
 
-
-
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework import status
-from django.db.models import Count
-from .models import CedulaRegistro
-
 @api_view(['GET'])
 def proyectos_totales(request):
     total_proyectos = CedulaRegistro.objects.count()
@@ -435,9 +438,6 @@ def cobertura_proyecto(request):
     data = CedulaRegistro.objects.values('cobertura').annotate(total=Count('cobertura')).order_by('-total')
     return Response(data, status=status.HTTP_200_OK)
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from .models import CedulaRegistro  # Asegúrate de importar correctamente el modelo
 
 class ProjectIdListView(APIView):
 
@@ -450,10 +450,21 @@ class ProjectIdListView(APIView):
 
 
 
-from django.contrib.sessions.models import Session
-from django.contrib import messages
-from django.shortcuts import redirect
-from django.contrib.auth.decorators import login_required
+class AnexosProyectoListView(generics.ListAPIView):
+    serializer_class = AnexoProyectoSerializer
+
+    def get_queryset(self):
+        projInvestment_id = self.kwargs.get('projInvestment_id')
+
+        if projInvestment_id:
+            # Verificamos si hay más de un anexo relacionado con la cédula y los obtenemos todos
+            cedula = get_object_or_404(CedulaRegistro, projInvestment_id=projInvestment_id)
+            return AnexoProyecto.objects.filter(cedula=cedula)
+        else:
+            # Si no se proporciona 'projInvestment_id', devolvemos todos los anexos
+            return AnexoProyecto.objects.all()
+
+
 
 @staff_member_required
 def logout_all_users(request):

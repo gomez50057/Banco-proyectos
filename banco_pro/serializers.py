@@ -2,7 +2,7 @@
 
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import FormProject
+from .models import FormProject, CedulaRegistro, AnexoProyecto
 
 
 class UsuarioSerializer(serializers.ModelSerializer):
@@ -46,12 +46,15 @@ class BulkCreateProjectSerializer(serializers.ModelSerializer):
             'longitud': {'required': False, 'allow_null': True},
         }
 
-from .models import CedulaRegistro, AnexoProyecto
-
 class AnexoProyectoSerializer(serializers.ModelSerializer):
+    # Si quieres incluir campos adicionales de la cédula asociada
+    projInvestment_id = serializers.CharField(source='cedula.projInvestment_id', read_only=True)
+    
     class Meta:
         model = AnexoProyecto
-        fields = ['id', 'nombre_anexo', 'archivo', 'descripcion']
+        # fields = ['projInvestment_id', 'tipo_anexo', 'archivo', 'descripcion']
+        fields = '__all__'
+
 
 class CedulaRegistroSerializer(serializers.ModelSerializer):
     anexos = AnexoProyectoSerializer(many=True, required=False)  # Mantiene los anexos
