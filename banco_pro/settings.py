@@ -27,6 +27,7 @@ SECRET_KEY = 'django-insecure-x=)j$7nobg_$_g91skeev1%s3a)-(q-57=&c+p*gn8@cvz9(39
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+# DEBUG = False
 
 # ALLOWED_HOSTS = []
 ALLOWED_HOSTS = ['bancodeproyectos.hidalgo.gob.mx', '10.16.17.189', 'localhost' ,'127.0.0.1']
@@ -161,6 +162,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Directorio de almacenamiento para los archivos multimedia
+MEDIA_ROOT = os.path.join(BASE_DIR, 'Documents')
 
 
 JAZZMIN_SETTINGS = {

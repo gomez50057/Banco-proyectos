@@ -10,8 +10,8 @@ except admin.sites.NotRegistered:
 
 class FormProjectAdmin(admin.ModelAdmin):
     list_display = (
-        'project_id','user', 'project_name', 'sector', 'tipo_proyecto', 'tipo_entidad',
-        'dependencia', 'organismo', 'municipioEnd', 'fecha_registro', 
+        'project_id','user', 'nombre_proyecto', 'sector', 'tipo_proyecto', 'tipo_entidad',
+        'dependencia', 'organismo', 'municipio_ayuntamiento', 'fecha_registro', 
     )
 
     def formfield_for_dbfield(self, db_field, **kwargs):
