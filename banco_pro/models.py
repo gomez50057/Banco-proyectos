@@ -52,7 +52,7 @@ class FormProject(models.Model):
     plan_municipal = models.TextField(null=True, blank=True)
     acuerdos_transversales= models.CharField(max_length=255, null=True, blank=True)
     ods = models.CharField(max_length=255)
-    plan_sectorial = models.CharField(max_length=255)
+    programas_SIE = models.CharField(max_length=255)
     indicadores_estrategicos = models.CharField(max_length=255)
     indicadores_tacticos = models.CharField(max_length=255, null=True, blank=True)
     
@@ -111,7 +111,7 @@ class FormProject(models.Model):
     isBlocked_plan_municipal = models.BooleanField(default=False)
     isBlocked_acuerdos_transversales = models.BooleanField(default=False)
     isBlocked_ods = models.BooleanField(default=False)
-    isBlocked_plan_sectorial = models.BooleanField(default=False)
+    isBlocked_programas_SIE = models.BooleanField(default=False)
     isBlocked_indicadores_estrategicos = models.BooleanField(default=False)
     isBlocked_indicadores_tacticos = models.BooleanField(default=False)
 
@@ -169,7 +169,7 @@ class FormProject(models.Model):
     observacion_plan_municipal = models.TextField(null=True, blank=True)
     observacion_acuerdos_transversales = models.TextField(null=True, blank=True)
     observacion_ods = models.TextField(null=True, blank=True)
-    observacion_plan_sectorial = models.TextField(null=True, blank=True)
+    observacion_programas_SIE = models.TextField(null=True, blank=True)
     observacion_indicadores_estrategicos = models.TextField(null=True, blank=True)
     observacion_indicadores_tacticos = models.TextField(null=True, blank=True)
 
