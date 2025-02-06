@@ -102,7 +102,7 @@ class BulkCreateUsers(View):
 
 def ver_proyectos_tabla(request):
     proyectos = FormProject.objects.filter(estatus__in=['Atendido', 'En Proceso']).values(
-        'project_id', 'project_name', 'estatus', 'porcentaje_avance', 'observaciones'
+        'project_id', 'nombre_proyecto', 'estatus', 'porcentaje_avance', 'observaciones'
     )
     return JsonResponse(list(proyectos), safe=False)
 
@@ -110,7 +110,7 @@ def ver_proyectos_tabla(request):
 def ver_proyectos_usuario(request):
     user = request.user
     proyectos = FormProject.objects.filter(user=user).values(
-        'isBlocked_project','estatus' , 'project_id', 'project_name', 'estatus', 'porcentaje_avance', 'observaciones'
+        'isBlocked_project','estatus' , 'project_id', 'nombre_proyecto', 'estatus', 'porcentaje_avance', 'observaciones'
     )
     return JsonResponse(list(proyectos), safe=False)
 
@@ -143,77 +143,36 @@ def current_user(request):
 def redirect_to_home(request):
     return redirect('/')
 
+
+FIELDS_TO_FETCH = ['project_id', 'area_adscripcion', 'user', 'nombre_registrante', 'apellido_paterno', 'apellido_materno', 'correo', 'telefono', 'telefono_ext', 'fecha_registro', 'nombre_proyecto', 'sector', 'tipo_proyecto', 'tipo_entidad', 'dependencia', 'organismo', 'municipio_ayuntamiento', 'unidad_responsable', 'unidad_presupuestal', 'inversion_federal', 'inversion_estatal', 'inversion_municipal', 'inversion_otros', 'inversion_total', 'ramo_presupuestal', 'descripcion', 'situacion_sin_proyecto', 'objetivos', 'metas', 'gasto_programable', 'tiempo_ejecucion', 'modalidad_ejecucion', 'programa_presupuestario', 'beneficiarios', 'normativa_aplicable', 'region', 'municipio', 'localidad', 'barrio_colonia', 'tipo_localidad', 'latitud', 'longitud', 'municipio_impacto', 'plan_nacional', 'plan_estatal', 'plan_municipal', 'acuerdos_transversales', 'ods', 'programas_SIE', 'indicadores_estrategicos', 'indicadores_estrategicos', 'situacion_actual', 'expediente_tecnico', 'estudios_factibilidad', 'analisis_alternativas', 'validacion_normativa', 'liberacion_derecho_via', 'analisis_costo_beneficio', 'proyecto_ejecutivo', 'manifestacion_impacto_ambiental', 'render', 'otros_estudios', 'observaciones', 'porcentaje_avance', 'estatus', 'situacion', 'retroalimentacion']
+
+BLOCKED_FIELDS_PREFIX = "isBlocked_"
+OBSERVATION_FIELDS_PREFIX = "observacion_"
+
+
 @method_decorator(csrf_exempt, name='dispatch')
 class ProjectView(View):
+
     def get(self, request, project_id=None):
         if project_id:
             project = get_object_or_404(FormProject, project_id=project_id)
             serializer = FormProjectSerializer(project)
             return JsonResponse(serializer.data, safe=False)
         else:
-            projects = FormProject.objects.values(
-                'id', 'project_id', 'fecha_registro', 'project_name', 'sector', 'tipo_proyecto', 
-                'tipo_entidad', 'dependencia', 'organismo', 'municipioEnd', 'peticion_personal', 
-                'unidad_responsable', 'unidad_presupuestal', 'ramo_presupuestal', 'monto_federal', 
-                'monto_estatal', 'monto_municipal', 'monto_otros', 'inversion_estimada', 'descripcion', 
-                'situacion_sin_proyecto', 'objetivos', 'metas', 'gasto_programable', 'programa_presupuestario', 
-                'beneficiarios', 'alineacion_normativa', 'region', 'municipio', 'municipio_impacto', 
-                'localidad', 'barrio_colonia_ejido', 'latitud', 'longitud', 'plan_nacional', 'plan_estatal', 
-                'plan_municipal', 'ods', 'plan_sectorial', 'indicadores_estrategicos', 'indicadores_tacticos', 
-                'indicadores_desempeno', 'indicadores_rentabilidad', 'estado_inicial', 'estado_con_proyecto', 
-                'estudios_prospectivos', 'estudios_factibilidad', 'analisis_alternativas', 'validacion_normativa',
-                'liberacion_derecho_via', 'situacion_sin_proyecto_fotografico', 'situacion_con_proyecto_proyeccion',
-                'analisis_costo_beneficio', 'expediente_tecnico', 'proyecto_ejecutivo', 'manifestacion_impacto_ambiental',
-                'otros_estudios', 'observaciones', 'porcentaje_avance', 'estatus', 'situacion', 'retroalimentacion',
-                'user__username',
-                # Campos de bloqueo
-                'isBlocked_project',
-                'isBlocked_project_name', 'isBlocked_sector', 'isBlocked_tipo_proyecto', 'isBlocked_tipo_entidad',
-                'isBlocked_dependencia', 'isBlocked_organismo', 'isBlocked_municipioEnd', 'isBlocked_peticion_personal',
-                'isBlocked_unidad_responsable', 'isBlocked_unidad_presupuestal', 'isBlocked_ramo_presupuestal',
-                'isBlocked_monto_federal', 'isBlocked_monto_estatal', 'isBlocked_monto_municipal', 'isBlocked_monto_otros',
-                'isBlocked_inversion_estimada', 'isBlocked_descripcion', 'isBlocked_situacion_sin_proyecto', 'isBlocked_objetivos',
-                'isBlocked_metas', 'isBlocked_gasto_programable', 'isBlocked_programa_presupuestario', 'isBlocked_beneficiarios',
-                'isBlocked_alineacion_normativa', 'isBlocked_region', 'isBlocked_municipio', 'isBlocked_municipio_impacto',
-                'isBlocked_localidad', 'isBlocked_barrio_colonia_ejido', 'isBlocked_latitud', 'isBlocked_longitud',
-                'isBlocked_plan_nacional', 'isBlocked_plan_estatal', 'isBlocked_plan_municipal', 'isBlocked_ods',
-                'isBlocked_plan_sectorial', 'isBlocked_indicadores_estrategicos', 'isBlocked_indicadores_tacticos',
-                'isBlocked_indicadores_desempeno', 'isBlocked_indicadores_rentabilidad', 'isBlocked_estado_inicial',
-                'isBlocked_estado_con_proyecto', 'isBlocked_estudios_prospectivos', 'isBlocked_estudios_factibilidad',
-                'isBlocked_analisis_alternativas', 'isBlocked_validacion_normativa', 'isBlocked_liberacion_derecho_via',
-                'isBlocked_situacion_sin_proyecto_fotografico', 'isBlocked_situacion_con_proyecto_proyeccion',
-                'isBlocked_analisis_costo_beneficio', 'isBlocked_expediente_tecnico', 'isBlocked_proyecto_ejecutivo',
-                'isBlocked_manifestacion_impacto_ambiental', 'isBlocked_otros_estudios', 'isBlocked_observaciones',
-                'isBlocked_porcentaje_avance', 'isBlocked_estatus', 'isBlocked_situacion', 'isBlocked_retroalimentacion',
-                # Campos de observación
-                'observacion_project_name', 'observacion_sector', 'observacion_tipo_proyecto', 'observacion_tipo_entidad',
-                'observacion_dependencia', 'observacion_organismo', 'observacion_municipioEnd', 'observacion_peticion_personal',
-                'observacion_unidad_responsable', 'observacion_unidad_presupuestal', 'observacion_ramo_presupuestal',
-                'observacion_monto_federal', 'observacion_monto_estatal', 'observacion_monto_municipal', 'observacion_monto_otros',
-                'observacion_inversion_estimada', 'observacion_descripcion', 'observacion_situacion_sin_proyecto', 'observacion_objetivos',
-                'observacion_metas', 'observacion_gasto_programable', 'observacion_programa_presupuestario', 'observacion_beneficiarios',
-                'observacion_alineacion_normativa', 'observacion_region', 'observacion_municipio', 'observacion_municipio_impacto',
-                'observacion_localidad', 'observacion_barrio_colonia_ejido', 'observacion_latitud', 'observacion_longitud',
-                'observacion_plan_nacional', 'observacion_plan_estatal', 'observacion_plan_municipal', 'observacion_ods',
-                'observacion_plan_sectorial', 'observacion_indicadores_estrategicos', 'observacion_indicadores_tacticos',
-                'observacion_indicadores_desempeno', 'observacion_indicadores_rentabilidad', 'observacion_estado_inicial',
-                'observacion_estado_con_proyecto', 'observacion_estudios_prospectivos', 'observacion_estudios_factibilidad',
-                'observacion_analisis_alternativas', 'observacion_validacion_normativa', 'observacion_liberacion_derecho_via',
-                'observacion_situacion_sin_proyecto_fotografico', 'observacion_situacion_con_proyecto_proyeccion',
-                'observacion_analisis_costo_beneficio', 'observacion_expediente_tecnico', 'observacion_proyecto_ejecutivo',
-                'observacion_manifestacion_impacto_ambiental', 'observacion_otros_estudios', 'observacion_observaciones',
-                'observacion_porcentaje_avance', 'observacion_estatus', 'observacion_situacion', 'observacion_retroalimentacion'
-            )
+            projects = FormProject.objects.defer(
+                *[f"{BLOCKED_FIELDS_PREFIX}{field}" for field in FIELDS_TO_FETCH],
+                *[f"{OBSERVATION_FIELDS_PREFIX}{field}" for field in FIELDS_TO_FETCH]
+            ).values(*FIELDS_TO_FETCH)
             return JsonResponse(list(projects), safe=False)
 
     def post(self, request):
         try:
             data = json.loads(request.body)
-            data['user'] = request.user.username  # Agregar el usuario actual al proyecto
+            data['user'] = request.user.username  # Agregar el usuario actual
             serializer = FormProjectSerializer(data=data)
             if serializer.is_valid():
                 serializer.save()
-                return JsonResponse({'message': 'Project created successfully', 'project_name': serializer.data['project_name']})
+                return JsonResponse({'message': 'Project created successfully', 'project': serializer.data}, status=201)
             return JsonResponse(serializer.errors, status=400)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
@@ -223,13 +182,11 @@ class ProjectView(View):
             project = get_object_or_404(FormProject, project_id=project_id)
             data = json.loads(request.body)
             for key, value in data.items():
-                # Asegurarse de que los campos bloqueados no se actualicen
-                if not getattr(project, f'isBlocked_{key}', False):
+                is_blocked = getattr(project, f"{BLOCKED_FIELDS_PREFIX}{key}", False)
+                if not is_blocked:
                     setattr(project, key, value)
             project.save()
             return JsonResponse({'message': 'Project updated successfully'})
-        except FormProject.DoesNotExist:
-            return JsonResponse({'error': 'Project not found'}, status=404)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
@@ -237,9 +194,12 @@ class ProjectView(View):
         try:
             project = get_object_or_404(FormProject, project_id=project_id)
             project.delete()
-            return JsonResponse({'message': 'Project deleted successfully'})
+            return JsonResponse({'message': 'Project deleted successfully'}, status=204)
         except FormProject.DoesNotExist:
             return JsonResponse({'error': 'Project not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+
 
 def generate_project_id(entity_type, entity_name, sector, current_year):
     entity_sigla = siglas.get(entity_type, {}).get(entity_name, 'UNK')
@@ -265,7 +225,7 @@ def create_project(request):
     current_year = datetime.now().year
     data = request.data.copy()
     entity_type = data.get('tipo_entidad')
-    entity_name = data.get('dependencia') if entity_type == 'Dependencia' else data.get('organismo') if entity_type == 'Organismo' else data.get('municipioEnd')
+    entity_name = data.get('dependencia') if entity_type == 'Dependencia' else data.get('organismo') if entity_type == 'Organismo' else data.get('municipio_ayuntamiento') 
     sector = data.get('sector')
 
     if not entity_type or not entity_name or not sector:
@@ -515,7 +475,7 @@ def logout_all_users(request):
 #     elements.append(Spacer(1, 20))
 
 #     # Título del documento centrado
-#     elements.append(Paragraph(f"Proyecto: {project.project_name}", styles['CustomTitle']))
+#     elements.append(Paragraph(f"Proyecto: {project.nombre_proyecto}", styles['CustomTitle']))
 #     elements.append(Spacer(1, 20))
 
 #     # Línea divisoria
@@ -546,7 +506,7 @@ def logout_all_users(request):
 #         ("Sector", project.sector),
 #         ("Dependencia", project.dependencia),
 #         ("Organismo", project.organismo),
-#         ("Municipio", project.municipioEnd),
+#         ("Municipio", project.municipio_ayuntamiento),
 #         ("Monto Federal", f"${project.monto_federal:,.2f}"),
 #         ("Monto Estatal", f"${project.monto_estatal:,.2f}"),
 #         ("Monto Municipal", f"${project.monto_municipal:,.2f}"),
