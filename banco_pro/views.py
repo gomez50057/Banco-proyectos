@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -49,6 +49,17 @@ from django.contrib.auth.decorators import login_required
 
 @csrf_exempt
 def inicio_sesion(request):
+    """
+    Vista para el inicio de sesión del usuario.
+    
+    Método POST:
+      - Recibe un JSON con 'username' y 'password'.
+      - Autentica al usuario y, de ser exitoso, inicia la sesión.
+      - Retorna el nombre del grupo del usuario (o 'sin grupo' si no pertenece a ninguno).
+    
+    Otros métodos:
+      - Retorna error indicando que el método no está permitido.
+    """
     if request.method == 'POST':
         data = json.loads(request.body)
         username = data.get('username')
@@ -67,9 +78,18 @@ def inicio_sesion(request):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class BulkCreateUsers(View):
+    """
+    Vista para la creación masiva de usuarios.
+    
+    Método POST:
+      - Recibe una lista de objetos JSON con los datos de los usuarios.
+      - Valida que se incluyan 'username', 'password' y 'tipo_cuenta'.
+      - Crea el usuario y lo añade al grupo correspondiente.
+      - Retorna un listado de los nombres de usuarios creados.
+    """
     def post(self, request):
         try:
-            # Lee el cuerpo de la solicitud y conviértelo a un objeto JSON
+            # Lee el cuerpo de la solicitud y lo convierte en objeto JSON
             data = json.loads(request.body)
             
             # Verifica que data sea una lista de usuarios
@@ -100,21 +120,48 @@ class BulkCreateUsers(View):
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=400)
 
+
 def ver_proyectos_tabla(request):
+    """
+    Vista que retorna una lista de proyectos filtrados por estatus ('Atendido' o 'En Proceso').
+
+    Retorna un JSON con los campos: project_id, nombre_proyecto, estatus, porcentaje_avance y observaciones.
+    """
     proyectos = FormProject.objects.filter(estatus__in=['Atendido', 'En Proceso']).values(
         'project_id', 'nombre_proyecto', 'estatus', 'porcentaje_avance', 'observaciones'
     )
     return JsonResponse(list(proyectos), safe=False)
 
+
 @login_required
 def ver_proyectos_usuario(request):
+    """
+    Vista que retorna los proyectos asociados al usuario autenticado.
+
+    Retorna un JSON con los campos:
+      - isBlocked_project
+      - estatus
+      - project_id
+      - nombre_proyecto
+      - porcentaje_avance
+      - observaciones
+    """
     user = request.user
     proyectos = FormProject.objects.filter(user=user).values(
         'isBlocked_project','estatus' , 'project_id', 'nombre_proyecto', 'estatus', 'porcentaje_avance', 'observaciones'
     )
     return JsonResponse(list(proyectos), safe=False)
 
+
 class BulkCreateProjects(APIView):
+    """
+    APIView para la creación masiva de proyectos.
+    
+    Método POST:
+      - Recibe una lista de objetos JSON.
+      - Utiliza el serializer BulkCreateProjectSerializer para validar y guardar los proyectos.
+      - Retorna los datos de los proyectos creados o errores de validación.
+    """
     def post(self, request, *args, **kwargs):
         if not isinstance(request.data, list):
             return Response({"error": "Se esperaba una lista de objetos"}, status=status.HTTP_400_BAD_REQUEST)
@@ -125,13 +172,26 @@ class BulkCreateProjects(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @staff_member_required
 def project_list_view(request):
+    """
+    Vista accesible solo para staff que renderiza una plantilla HTML con la lista completa de proyectos.
+    """
     projects = FormProject.objects.all()
     return render(request, 'project_list.html', {'projects': projects})
 
+
 @login_required
 def current_user(request):
+    """
+    Vista que retorna información básica del usuario autenticado.
+
+    Retorna un JSON con los campos:
+      - username
+      - email
+      - groups (lista de nombres de grupo a los que pertenece)
+    """
     user = request.user
     user_data = {
         'username': user.username,
@@ -140,10 +200,15 @@ def current_user(request):
     }
     return JsonResponse(user_data)
 
+
 def redirect_to_home(request):
+    """
+    Vista que redirige a la página de inicio.
+    """
     return redirect('/')
 
 
+# Constantes para la obtención de campos y prefijos de bloqueo y observación.
 FIELDS_TO_FETCH = ['project_id', 'area_adscripcion', 'user', 'nombre_registrante', 'apellido_paterno', 'apellido_materno', 'correo', 'telefono', 'telefono_ext', 'fecha_registro', 'nombre_proyecto', 'sector', 'tipo_proyecto', 'tipo_entidad', 'dependencia', 'organismo', 'municipio_ayuntamiento', 'unidad_responsable', 'unidad_presupuestal', 'inversion_federal', 'inversion_estatal', 'inversion_municipal', 'inversion_otros', 'inversion_total', 'ramo_presupuestal', 'descripcion', 'situacion_sin_proyecto', 'objetivos', 'metas', 'gasto_programable', 'tiempo_ejecucion', 'modalidad_ejecucion', 'programa_presupuestario', 'beneficiarios', 'normativa_aplicable', 'region', 'municipio', 'localidad', 'barrio_colonia', 'tipo_localidad', 'latitud', 'longitud', 'plan_nacional', 'plan_estatal', 'plan_municipal', 'acuerdos_transversales', 'ods', 'programas_SIE', 'indicadores_estrategicos', 'indicadores_estrategicos', 'situacion_actual', 'expediente_tecnico', 'estudios_factibilidad', 'analisis_alternativas', 'validacion_normativa', 'liberacion_derecho_via', 'analisis_costo_beneficio', 'proyecto_ejecutivo', 'manifestacion_impacto_ambiental', 'render', 'otros_estudios', 'observaciones', 'porcentaje_avance', 'estatus', 'situacion', 'retroalimentacion']
 
 BLOCKED_FIELDS_PREFIX = "isBlocked_"
@@ -152,8 +217,31 @@ OBSERVATION_FIELDS_PREFIX = "observacion_"
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ProjectView(View):
+    """
+    Vista basada en clases para la gestión de proyectos.
+    
+    Soporta los siguientes métodos:
+      - GET:
+          * Si se provee 'project_id', retorna el detalle de un proyecto.
+          * Si no se provee, retorna una lista de proyectos con campos definidos.
+      - POST:
+          * Crea un nuevo proyecto utilizando FormProjectSerializer.
+      - PUT:
+          * Actualiza un proyecto existente (considerando campos bloqueados).
+      - DELETE:
+          * Elimina un proyecto según su 'project_id'.
+    """
 
     def get(self, request, project_id=None):
+        """
+        Maneja la solicitud GET.
+        
+        Parámetros:
+          - project_id (opcional): Si se provee, retorna los detalles de ese proyecto.
+        
+        Retorna:
+          - JSON con los datos del proyecto o la lista de proyectos.
+        """
         if project_id:
             project = get_object_or_404(FormProject, project_id=project_id)
             serializer = FormProjectSerializer(project)
@@ -166,6 +254,14 @@ class ProjectView(View):
             return JsonResponse(list(projects), safe=False)
 
     def post(self, request):
+        """
+        Maneja la solicitud POST para crear un nuevo proyecto.
+        
+        Procedimiento:
+          - Convierte el cuerpo de la solicitud a JSON.
+          - Agrega el usuario actual (username) a los datos.
+          - Valida y guarda el proyecto mediante FormProjectSerializer.
+        """
         try:
             data = json.loads(request.body)
             data['user'] = request.user.username  # Agregar el usuario actual
@@ -178,6 +274,15 @@ class ProjectView(View):
             return JsonResponse({'error': str(e)}, status=400)
 
     def put(self, request, project_id):
+        """
+        Maneja la solicitud PUT para actualizar un proyecto existente.
+        
+        Procedimiento:
+          - Obtiene el proyecto a través de 'project_id'.
+          - Itera sobre cada clave/valor del JSON recibido.
+          - Actualiza los campos que no estén bloqueados (verificación mediante el prefijo 'isBlocked_').
+          - Guarda el proyecto actualizado.
+        """
         try:
             project = get_object_or_404(FormProject, project_id=project_id)
             data = json.loads(request.body)
@@ -191,6 +296,14 @@ class ProjectView(View):
             return JsonResponse({'error': str(e)}, status=400)
 
     def delete(self, request, project_id):
+        """
+        Maneja la solicitud DELETE para eliminar un proyecto.
+        
+        Procedimiento:
+          - Obtiene el proyecto a través de 'project_id'.
+          - Elimina el proyecto y retorna un mensaje de éxito.
+          - En caso de no encontrar el proyecto, retorna error 404.
+        """
         try:
             project = get_object_or_404(FormProject, project_id=project_id)
             project.delete()
@@ -202,6 +315,23 @@ class ProjectView(View):
 
 
 def generate_project_id(entity_type, entity_name, sector, current_year):
+    """
+    Función para generar el 'project_id' de un proyecto.
+    
+    Parámetros:
+      - entity_type: Tipo de entidad (ej. Dependencia, Organismo, etc.).
+      - entity_name: Nombre de la entidad, determinado según el tipo.
+      - sector: Sector del proyecto.
+      - current_year: Año actual.
+    
+    Procedimiento:
+      - Obtiene la sigla de la entidad y el código del sector.
+      - Calcula un número consecutivo basado en la cantidad de proyectos creados en el año.
+      - Concatena los elementos para formar el 'project_id'.
+    
+    Retorna:
+      - El 'project_id' generado.
+    """
     entity_sigla = siglas.get(entity_type, {}).get(entity_name, 'UNK')
     
     if entity_sigla == 'UNK':
@@ -222,6 +352,20 @@ def generate_project_id(entity_type, entity_name, sector, current_year):
 
 @api_view(['POST'])
 def create_project(request):
+    """
+    API endpoint para crear un nuevo proyecto.
+    
+    Procedimiento:
+      - Obtiene el año actual.
+      - Extrae 'tipo_entidad', y según éste obtiene el nombre de la entidad ('dependencia', 'organismo' o 'municipio_ayuntamiento').
+      - Verifica que existan 'tipo_entidad', 'entity_name' y 'sector'; de lo contrario retorna un error.
+      - Genera el 'project_id' mediante la función generate_project_id.
+      - Agrega el usuario autenticado a los datos.
+      - Valida y guarda el proyecto utilizando FormProjectSerializer.
+    
+    Retorna:
+      - Los datos del proyecto creado o errores de validación.
+    """
     current_year = datetime.now().year
     data = request.data.copy()
     entity_type = data.get('tipo_entidad')
@@ -241,10 +385,24 @@ def create_project(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class ReactAppView(TemplateView):
+    """
+    Vista que renderiza la aplicación React.
+    
+    - Renderiza el template 'index.html', que generalmente carga la aplicación frontend.
+    """
     template_name = "index.html"
 
 class UpdateProjectView(APIView):
+    """
+    APIView para actualizar un proyecto de forma parcial.
+    
+    Método PUT:
+      - Busca el proyecto a través de 'project_id'.
+      - Valida y actualiza el proyecto utilizando FormProjectSerializer de manera parcial.
+      - Retorna los datos actualizados o errores de validación.
+    """
     def put(self, request, project_id):
         try:
             project = FormProject.objects.get(project_id=project_id)
@@ -262,6 +420,14 @@ from django.contrib.auth import logout
 
 @csrf_exempt
 def logout_view(request):
+    """
+    Vista para cerrar la sesión del usuario.
+    
+    Método POST:
+      - Cierra la sesión y retorna un mensaje de éxito.
+    Otros métodos:
+      - Retorna error indicando que el método no está permitido.
+    """
     if request.method == 'POST':
         logout(request)
         return JsonResponse({'message': 'Sesión cerrada con éxito'}, status=200)
@@ -273,6 +439,12 @@ def logout_view(request):
 
 @csrf_exempt
 def refresh_csrf_token(request):
+    """
+    Vista para refrescar y retornar el token CSRF.
+    
+    Retorna:
+      - Un JSON con la clave 'csrfToken' obtenida desde la cookie CSRF.
+    """
     return JsonResponse({"csrfToken": request.META.get("CSRF_COOKIE")})
 
 
