@@ -30,6 +30,14 @@ from .serializers import (
 from .utils import siglas, sector_codes, generate_proj_investment_id
 
 
+from rest_framework.views import APIView
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.response import Response
+from rest_framework import status
+from django.shortcuts import get_object_or_404
+from .models import FormProject, Document
+from .serializers import DocumentSerializer
+
 @csrf_exempt
 def inicio_sesion(request):
     """
@@ -192,7 +200,7 @@ def redirect_to_home(request):
 
 
 # Constantes para la obtención de campos y prefijos de bloqueo y observación.
-FIELDS_TO_FETCH = ['project_id', 'area_adscripcion', 'user', 'nombre_registrante', 'apellido_paterno', 'apellido_materno', 'correo', 'telefono', 'telefono_ext', 'fecha_registro', 'nombre_proyecto', 'sector', 'tipo_proyecto', 'tipo_entidad', 'dependencia', 'organismo', 'municipio_ayuntamiento', 'unidad_responsable', 'unidad_presupuestal', 'inversion_federal', 'inversion_estatal', 'inversion_municipal', 'inversion_otros', 'inversion_total', 'ramo_presupuestal', 'descripcion', 'situacion_sin_proyecto', 'objetivos', 'metas', 'gasto_programable', 'tiempo_ejecucion', 'modalidad_ejecucion', 'programa_presupuestario', 'beneficiarios', 'normativa_aplicable', 'region', 'municipio', 'localidad', 'barrio_colonia', 'tipo_localidad', 'latitud', 'longitud', 'plan_nacional', 'plan_estatal', 'plan_municipal', 'acuerdos_transversales', 'ods', 'programas_SIE', 'indicadores_estrategicos', 'indicadores_estrategicos', 'situacion_actual', 'expediente_tecnico', 'estudios_factibilidad', 'analisis_alternativas', 'validacion_normativa', 'liberacion_derecho_via', 'analisis_costo_beneficio', 'proyecto_ejecutivo', 'manifestacion_impacto_ambiental', 'render', 'otros_estudios', 'observaciones', 'porcentaje_avance', 'estatus', 'situacion', 'retroalimentacion']
+FIELDS_TO_FETCH = ['project_id', 'area_adscripcion', 'user', 'nombre_registrante', 'apellido_paterno', 'apellido_materno', 'correo', 'telefono', 'telefono_ext', 'fecha_registro', 'nombre_proyecto', 'sector', 'tipo_proyecto', 'tipo_entidad', 'dependencia', 'organismo', 'municipio_ayuntamiento', 'unidad_responsable', 'unidad_presupuestal', 'inversion_federal', 'inversion_estatal', 'inversion_municipal', 'inversion_otros', 'inversion_total', 'ramo_presupuestal', 'descripcion', 'situacion_sin_proyecto', 'objetivos', 'metas', 'gasto_programable', 'tiempo_ejecucion', 'modalidad_ejecucion', 'programa_presupuestario', 'beneficiarios', 'normativa_aplicable', 'region', 'municipio', 'localidad', 'barrio_colonia', 'tipo_localidad', 'latitud', 'longitud', 'plan_nacional', 'plan_estatal', 'plan_municipal', 'acuerdos_transversales', 'ods', 'programas_SIE', 'indicadores_estrategicos', 'indicadores_estrategicos', 'observaciones', 'porcentaje_avance', 'estatus', 'situacion', 'retroalimentacion']
 
 BLOCKED_FIELDS_PREFIX = "isBlocked_"
 OBSERVATION_FIELDS_PREFIX = "observacion_"
@@ -417,7 +425,25 @@ def logout_view(request):
     else:
         return JsonResponse({'error': 'Método no permitido'}, status=405)
 
-
+class DocumentUploadView(APIView):
+    """
+    API endpoint para subir documentos a un proyecto específico.
+    """
+    parser_classes = (MultiPartParser, FormParser)
+    
+    def post(self, request, project_id, format=None):
+        # Se busca el proyecto mediante project_id
+        project = get_object_or_404(FormProject, project_id=project_id)
+        
+        # Se espera recibir 'document_type' y 'file' en el request.data
+        data = request.data.copy()
+        data['project'] = project.id  # Asigna la clave foránea
+        
+        serializer = DocumentSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @csrf_exempt

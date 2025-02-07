@@ -12,6 +12,8 @@ from .views import refresh_csrf_token
 from . import views
 from .views import ProjectIdListView  
 from .views import AnexosProyectoListView
+from .views import DocumentUploadView
+
 
 urlpatterns = [
     # Admin URL
@@ -37,6 +39,7 @@ urlpatterns = [
     path('proyecto/<str:project_id>/', ProjectView.as_view(), name='project-detail'),
     # path('proyecto/reporte/<str:project_id>/', generate_pdf, name='project-report'),
     path('update-project/<str:project_id>/', UpdateProjectView.as_view(), name='update-project'),
+    path('projects/<str:project_id>/upload-document/', DocumentUploadView.as_view(), name='upload-document'),
 
     path('ver-proyectos-usuario/', views.ver_proyectos_usuario, name='ver_proyectos_usuario'),
    

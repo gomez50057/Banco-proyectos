@@ -4,6 +4,23 @@ from django.contrib.auth.models import User
 import os
 
 
+def document_upload_to(instance, filename):
+    """
+    Construye la ruta de almacenamiento para un documento.
+    Se intenta obtener el valor del campo 'project_id' (campo custom) del proyecto relacionado;
+    si no está disponible, se usa 'unknown' como valor.
+    Ruta: 'Documents/bancoProyectos/<project_custom_id>/<document_type>/<filename>'
+    """
+    try:
+        # Intentamos obtener el campo custom 'project_id' del proyecto relacionado
+        project_custom_id = instance.project.project_id
+        if not project_custom_id:
+            project_custom_id = 'unknown'
+    except Exception:
+        project_custom_id = 'unknown'
+    return f"Documents/bancoProyectos/{project_custom_id}/{instance.document_type}/{filename}"
+
+
 class FormProject(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='projects')
     project_id = models.CharField(max_length=50, unique=True, blank=True, null=True)
@@ -58,17 +75,17 @@ class FormProject(models.Model):
     indicadores_estrategicos = models.CharField(max_length=255)
     indicadores_socioeconomicos = models.CharField(max_length=255)
     
-    situacion_actual = models.ImageField(upload_to='documentos/situacion_actual/', null=True, blank=True)
-    expediente_tecnico = models.FileField(upload_to='documentos/expediente_tecnico/', null=True, blank=True)
-    estudios_factibilidad = models.FileField(upload_to='documentos/estudios_factibilidad/', null=True, blank=True)
-    analisis_alternativas = models.FileField(upload_to='documentos/analisis_alternativas/', null=True, blank=True)
-    validacion_normativa = models.FileField(upload_to='documentos/validacion_normativa/', null=True, blank=True)
-    liberacion_derecho_via = models.FileField(upload_to='documentos/liberacion_derecho_via/', null=True, blank=True)
-    analisis_costo_beneficio = models.FileField(upload_to='documentos/analisis_costo_beneficio/', null=True, blank=True)
-    proyecto_ejecutivo = models.FileField(upload_to='documentos/proyecto_ejecutivo/', null=True, blank=True)
-    manifestacion_impacto_ambiental = models.FileField(upload_to='documentos/manifestacion_impacto_ambiental/', null=True, blank=True)
-    render = models.FileField(upload_to='documentos/render/', null=True, blank=True)
-    otros_estudios = models.FileField(upload_to='documentos/otros_estudios/', null=True, blank=True)
+    # situacion_actual = models.ImageField(upload_to='documentos/situacion_actual/', null=True, blank=True)
+    # expediente_tecnico = models.FileField(upload_to='documentos/expediente_tecnico/', null=True, blank=True)
+    # estudios_factibilidad = models.FileField(upload_to='documentos/estudios_factibilidad/', null=True, blank=True)
+    # analisis_alternativas = models.FileField(upload_to='documentos/analisis_alternativas/', null=True, blank=True)
+    # validacion_normativa = models.FileField(upload_to='documentos/validacion_normativa/', null=True, blank=True)
+    # liberacion_derecho_via = models.FileField(upload_to='documentos/liberacion_derecho_via/', null=True, blank=True)
+    # analisis_costo_beneficio = models.FileField(upload_to='documentos/analisis_costo_beneficio/', null=True, blank=True)
+    # proyecto_ejecutivo = models.FileField(upload_to='documentos/proyecto_ejecutivo/', null=True, blank=True)
+    # manifestacion_impacto_ambiental = models.FileField(upload_to='documentos/manifestacion_impacto_ambiental/', null=True, blank=True)
+    # render = models.FileField(upload_to='documentos/render/', null=True, blank=True)
+    # otros_estudios = models.FileField(upload_to='documentos/otros_estudios/', null=True, blank=True)
 
     observaciones = models.TextField(null=True, blank=True)
     porcentaje_avance = models.DecimalField(max_digits=5, decimal_places=2, default=0)
@@ -199,6 +216,33 @@ class FormProject(models.Model):
 
     def __str__(self):
         return self.nombre_proyecto
+    
+
+class Document(models.Model):
+    DOCUMENT_TYPE_CHOICES = (
+        ('expediente_tecnico', 'Expediente Técnico'),
+        ('estudios_factibilidad', 'Estudios de Factibilidad'),
+        ('analisis_alternativas', 'Análisis de Alternativas'),
+        ('validacion_normativa', 'Validación Normativa'),
+        ('liberacion_derecho_via', 'Liberación Derecho Vía'),
+        ('analisis_costo_beneficio', 'Análisis Costo Beneficio'),
+        ('proyecto_ejecutivo', 'Proyecto Ejecutivo'),
+        ('manifestacion_impacto_ambiental', 'Manifestación Impacto Ambiental'),
+        ('render', 'Render'),
+        ('otros_estudios', 'Otros Estudios'),
+    )
+    
+    project = models.ForeignKey(FormProject, on_delete=models.CASCADE, related_name='documents')
+    document_type = models.CharField(max_length=50, choices=DOCUMENT_TYPE_CHOICES)
+    file = models.FileField(upload_to=document_upload_to)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.project.project_id} - {self.document_type}"
+
+
+
+
 
 def custom_upload_to(instance, filename):
     # Obtener el ID del proyecto y el tipo de anexo
