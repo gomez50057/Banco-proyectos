@@ -1,51 +1,34 @@
-from django.contrib.auth import authenticate, login, logout
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from django.contrib.admin.views.decorators import staff_member_required
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-from django.views import View
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework import status
 import json
 from datetime import datetime
 
+from django.contrib import messages
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
-
-from .models import FormProject
-from .serializers import FormProjectSerializer, BulkCreateProjectSerializer, FormProjectSerializer 
-from .utils import siglas, sector_codes
+from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.sessions.models import Session
+from django.db.models import Count
+from django.http import JsonResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.utils.decorators import method_decorator
+from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 
-
-from rest_framework import generics
-from .serializers import CedulaRegistroSerializer
-from .utils import generate_proj_investment_id  # Importa la función utilitaria
-from rest_framework import status
-from rest_framework.response import Response
-from datetime import datetime
-
-from .models import AnexoProyecto, CedulaRegistro
-
+from rest_framework import generics, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import status
-from django.db.models import Count
-from .models import CedulaRegistro
-
 from rest_framework.views import APIView
-from rest_framework.response import Response
-from .models import CedulaRegistro  
-from django.shortcuts import get_object_or_404
-from .serializers import AnexoProyectoSerializer
 
-from django.contrib.sessions.models import Session
-from django.contrib import messages
-from django.shortcuts import redirect
-from django.contrib.auth.decorators import login_required
+from .models import FormProject, AnexoProyecto, CedulaRegistro
+from .serializers import (
+    FormProjectSerializer,
+    BulkCreateProjectSerializer,
+    CedulaRegistroSerializer,
+    AnexoProyectoSerializer,
+)
+from .utils import siglas, sector_codes, generate_proj_investment_id
+
 
 @csrf_exempt
 def inicio_sesion(request):
