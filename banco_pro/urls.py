@@ -13,6 +13,7 @@ from . import views
 from .views import ProjectIdListView  
 from .views import AnexosProyectoListView
 from .views import DocumentUploadView
+# from .views import ProjectHistoryView
 
 
 urlpatterns = [
@@ -42,6 +43,7 @@ urlpatterns = [
     path('projects/<str:project_id>/upload-document/', DocumentUploadView.as_view(), name='upload-document'),
 
     path('ver-proyectos-usuario/', views.ver_proyectos_usuario, name='ver_proyectos_usuario'),
+    path('ver-proyectos-tabla-admin/', views.ver_proyectos_tabla_admin, name='ver_proyectos_tabla_admin'),
    
     # API URL to get the current user
     path('api/current_user/', current_user, name='current_user'),
@@ -55,7 +57,12 @@ urlpatterns = [
     # path('consulta/', ReactAppView.as_view(), name='consulta'),
     # path('reporte-inversion/161309240001/', ReactAppView.as_view(), name='reporte-inversion'),
 
-    # cedulas
+
+    # Auditoría 
+    # path('projects/<str:project_id>/', ProjectView.as_view(), name='project_detail'),
+    # path('projects/<str:project_id>/history/', ProjectHistoryView.as_view(), name='project_history'),
+
+    # Cedulas
     path('cedulas/', CedulaRegistroListCreateView.as_view(), name='cedula-list-create'),
     path('cedulas/<str:projInvestment_id>/', CedulaRegistroDetailUpdateDeleteView.as_view(), name='cedula-detail-update-delete'),
 

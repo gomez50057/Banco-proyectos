@@ -91,7 +91,7 @@ siglas = {
         'Universidad Digital del Estado de Hidalgo': 'UDH',
         # Add all other organisms here...
     },
-    'municipio_ayuntamiento': {
+    'Ayuntamiento': {
         '001 Acatlán': '001',
         '002 Acaxochitlán': '002',
         '003 Actopan': '003',

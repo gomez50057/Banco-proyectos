@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User, Group
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.sessions.models import Session
-from django.db.models import Count
+from django.db.models import Count, F
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.decorators import method_decorator
@@ -37,6 +37,8 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .models import FormProject, Document
 from .serializers import DocumentSerializer
+
+# from .models import FormProjectHistory
 
 @csrf_exempt
 def inicio_sesion(request):
@@ -122,6 +124,32 @@ def ver_proyectos_tabla(request):
         'project_id', 'nombre_proyecto', 'estatus', 'porcentaje_avance', 'observaciones'
     )
     return JsonResponse(list(proyectos), safe=False)
+
+def ver_proyectos_tabla_admin(request):
+    """
+    Vista que retorna una lista de todos los proyectos, mostrando todos los campos del modelo
+    excepto aquellos que comienzan con 'isBlocked' o 'observacion',
+    y reemplazando el campo 'user' por el nombre de usuario.
+    """
+    proyectos = FormProject.objects.all().select_related('user')
+    resultado = []
+    
+    for proyecto in proyectos:
+        datos = {}
+        for field in proyecto._meta.fields:
+            field_name = field.name
+            # Excluir campos que comienzan con 'isBlocked' o 'observacion'
+            if field_name.startswith('isBlocked') or field_name.startswith('observacion'):
+                continue
+            # Si es el campo 'user', se reemplaza por el nombre de usuario
+            if field_name == 'user':
+                datos[field_name] = proyecto.user.username
+            else:
+                datos[field_name] = getattr(proyecto, field_name)
+        resultado.append(datos)
+        
+    return JsonResponse(resultado, safe=False)
+
 
 
 @login_required
@@ -360,7 +388,12 @@ def create_project(request):
     current_year = datetime.now().year
     data = request.data.copy()
     entity_type = data.get('tipo_entidad')
-    entity_name = data.get('dependencia') if entity_type == 'Dependencia' else data.get('organismo') if entity_type == 'Organismo' else data.get('municipio_ayuntamiento') 
+    mapping = {
+        'Dependencia': data.get('dependencia'),
+        'Organismo': data.get('organismo'),
+        'Ayuntamiento': data.get('municipio_ayuntamiento')
+    }
+    entity_name = mapping.get(entity_type, None)
     sector = data.get('sector')
 
     if not entity_type or not entity_name or not sector:
@@ -435,11 +468,11 @@ class DocumentUploadView(APIView):
         # Se busca el proyecto mediante project_id
         project = get_object_or_404(FormProject, project_id=project_id)
         
-        # Se espera recibir 'document_type' y 'file' en el request.data
-        data = request.data.copy()
-        data['project'] = project.id  # Asigna la clave foránea
+        # Permitir la modificación de request.data
+        request.data._mutable = True
+        request.data['project'] = project.id
+        serializer = DocumentSerializer(data=request.data)
         
-        serializer = DocumentSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -457,7 +490,59 @@ def refresh_csrf_token(request):
     return JsonResponse({"csrfToken": request.META.get("CSRF_COOKIE")})
 
 
+# Historaial 
+
+
+# class ProjectView(View):
+#     def put(self, request, project_id):
+#         """
+#         Maneja la actualización de un proyecto y almacena un historial de cambios.
+#         """
+#         project = get_object_or_404(FormProject, project_id=project_id)
+#         data = json.loads(request.body)
+#         user = request.user  # Usuario autenticado
+
+#         changes = {}  # Diccionario para almacenar los cambios
+
+#         for key, value in data.items():
+#             is_blocked = getattr(project, f"isBlocked_{key}", False)
+
+#             if not is_blocked:
+#                 old_value = getattr(project, key, None)
+#                 if old_value != value:
+#                     changes[key] = {"antes": old_value, "después": value}
+#                     setattr(project, key, value)
+
+#         if changes:
+#             project.last_modified_by = user
+#             project.last_modified_at = datetime.now()
+#             project.save()
+
+#             # Guardar en el historial
+#             FormProjectHistory.objects.create(
+#                 project=project,
+#                 user=user,
+#                 changes=changes
+#             )
+
+#         return JsonResponse({'message': 'Proyecto actualizado con historial registrado'})
+
+
+# class ProjectHistoryView(View):
+#     def get(self, request, project_id):
+#         """
+#         Devuelve el historial de cambios de un proyecto.
+#         """
+#         project = get_object_or_404(FormProject, project_id=project_id)
+#         history = project.history.order_by('-timestamp').values('user__username', 'timestamp', 'changes')
+
+#         return JsonResponse(list(history), safe=False)
+
+
+# ---------------------------------------------
 # Vista para listar y crear CedulaRegistro
+# ---------------------------------------------
+
 class CedulaRegistroListCreateView(generics.ListCreateAPIView):
     queryset = CedulaRegistro.objects.select_related('user').all()  # Utilizamos select_related para traer el user
     serializer_class = CedulaRegistroSerializer

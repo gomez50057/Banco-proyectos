@@ -3,6 +3,14 @@ from django.db import models
 from django.contrib.auth.models import User
 import os
 
+# class FormProjectHistory(models.Model):
+#     project = models.ForeignKey('FormProject', on_delete=models.CASCADE, related_name='history')
+#     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+#     timestamp = models.DateTimeField(auto_now_add=True)
+#     changes = models.JSONField()  # Guardará los cambios en formato JSON
+
+#     def __str__(self):
+#         return f"Historial de {self.project.nombre_proyecto} - {self.timestamp}"
 
 def document_upload_to(instance, filename):
     """
@@ -213,6 +221,10 @@ class FormProject(models.Model):
     observacion_estatus = models.TextField(null=True, blank=True)
     observacion_situacion = models.TextField(null=True, blank=True)
     observacion_retroalimentacion = models.TextField(null=True, blank=True)
+
+    # # Campos para auditoría
+    # last_modified_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='last_modified_projects')
+    # last_modified_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.nombre_proyecto
