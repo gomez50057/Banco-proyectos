@@ -171,8 +171,8 @@ JAZZMIN_SETTINGS = {
     "site_title": "Mi Administración",
     "site_header": "Panel de Administración",
     "site_brand": "Admin",
-    "site_logo": "path/to/your/logo.png",  # Cambia esto con la ruta a tu logo
-    "login_logo": "https://bibliotecadigitaluplaph.hidalgo.gob.mx/img_banco/Logotipo.webp",  # Cambia esto con la ruta a tu logo
+    "site_logo": "path/estrella.webp",
+    "login_logo": "path/logo.webp",
     "welcome_sign": "Bienvenido al Panel de Administración",
     "show_sidebar": True,
     "navigation_expanded": True,
@@ -201,14 +201,14 @@ JAZZMIN_SETTINGS = {
     #         "permissions": ["banco_pro.view_project"]
     #     }]
     # },
-    "custom_links": {
-        "auth": [{
-            "name": "Historial",
-            "url": "admin:simple_history_dashboard",
-            "icon": "fas fa-history",
-            "permissions": ["auth.view_user"]
-        }]
-    },
+    # "custom_links": {
+    #     "auth": [{
+    #         "name": "Historial",
+    #         "url": "admin:simple_history_dashboard",
+    #         "icon": "fas fa-history",
+    #         "permissions": ["auth.view_user"]
+    #     }]
+    # },
     "usermenu_links": [
         {"name": "Soporte", "url": "https://www.example.com/support", "new_window": True},
         {"model": "auth.user"}
@@ -219,8 +219,8 @@ JAZZMIN_SETTINGS = {
         "auth.group": "vertical_tabs"
     },
     "related_modal_active": False,
-    "custom_css": "path/to/your/custom.css",  # Cambia esto con la ruta a tu archivo CSS personalizado
-    "custom_js": "path/to/your/custom.js",  # Cambia esto con la ruta a tu archivo JS personalizado
+    "custom_css": "path/custom.css",
+    "custom_js": "path/custom.js",
     "show_ui_builder": True,
 }
 

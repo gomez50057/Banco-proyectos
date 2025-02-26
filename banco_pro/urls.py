@@ -14,6 +14,7 @@ from .views import ProjectIdListView
 from .views import AnexosProyectoListView
 from .views import DocumentUploadView
 # from .views import ProjectHistoryView
+from .admin_custom import custom_admin_site
 
 
 urlpatterns = [
@@ -56,6 +57,7 @@ urlpatterns = [
     # path('panel-usuario/', ReactAppView.as_view(), name='panel-usuario'),
     # path('consulta/', ReactAppView.as_view(), name='consulta'),
     # path('reporte-inversion/161309240001/', ReactAppView.as_view(), name='reporte-inversion'),
+    path('admin-proyectos/', custom_admin_site.urls),
 
 
     # Auditoría 
