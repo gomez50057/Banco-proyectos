@@ -16,6 +16,9 @@ from .views import DocumentUploadView
 # from .views import ProjectHistoryView
 from .admin_custom import custom_admin_site
 
+# son de PLan hidrico 
+from django.contrib import admin
+from django.urls import path, include
 
 urlpatterns = [
     # Admin URL
@@ -59,6 +62,7 @@ urlpatterns = [
     # path('reporte-inversion/161309240001/', ReactAppView.as_view(), name='reporte-inversion'),
     path('admin-proyectos/', custom_admin_site.urls),
 
+    path('api/', include('formulario.urls')),
 
     # Auditoría 
     # path('projects/<str:project_id>/', ProjectView.as_view(), name='project_detail'),
@@ -81,6 +85,6 @@ urlpatterns = [
     path('cedulas/anexos/<projInvestment_id>/', AnexosProyectoListView.as_view(), name='anexos-proyecto'),
 
     # Para todas las demás rutas, redirige a la vista de React
-    re_path(r'^(?!admin|api|static|media).*$',
+    re_path(r'^(?!admin|static|media).*$',
         ReactAppView.as_view(), name='react-app'),
 ]

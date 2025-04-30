@@ -129,7 +129,7 @@ def ver_proyectos_tabla_admin(request):
     """
     Vista que retorna una lista de todos los proyectos, mostrando todos los campos del modelo
     excepto aquellos que comienzan con 'isBlocked' o 'observacion',
-    y reemplazando el campo 'user' por el nombre de usuario.
+    y reemplazando el campo 'user' (y cualquier campo que sea una instancia de User) por el nombre de usuario.
     """
     proyectos = FormProject.objects.all().select_related('user')
     resultado = []
@@ -141,11 +141,12 @@ def ver_proyectos_tabla_admin(request):
             # Excluir campos que comienzan con 'isBlocked' o 'observacion'
             if field_name.startswith('isBlocked') or field_name.startswith('observacion'):
                 continue
-            # Si es el campo 'user', se reemplaza por el nombre de usuario
-            if field_name == 'user':
+            value = getattr(proyecto, field_name)
+            # Si es el campo 'user' o una instancia de User, se reemplaza por el username
+            if field_name == 'user' or isinstance(value, User):
                 datos[field_name] = proyecto.user.username
             else:
-                datos[field_name] = getattr(proyecto, field_name)
+                datos[field_name] = value
         resultado.append(datos)
         
     return JsonResponse(resultado, safe=False)
@@ -292,20 +293,20 @@ class ProjectView(View):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
 
+    from django.contrib.auth.models import User  # Asegúrate de tener importado el modelo User
+
     def put(self, request, project_id):
         """
         Maneja la solicitud PUT para actualizar un proyecto existente.
-        
-        Procedimiento:
-          - Obtiene el proyecto a través de 'project_id'.
-          - Itera sobre cada clave/valor del JSON recibido.
-          - Actualiza los campos que no estén bloqueados (verificación mediante el prefijo 'isBlocked_').
-          - Guarda el proyecto actualizado.
+        Se omite la actualización del campo 'user' para evitar errores de asignación.
         """
         try:
             project = get_object_or_404(FormProject, project_id=project_id)
             data = json.loads(request.body)
             for key, value in data.items():
+                # Evitamos actualizar el campo 'user'
+                if key == 'user':
+                    continue
                 is_blocked = getattr(project, f"{BLOCKED_FIELDS_PREFIX}{key}", False)
                 if not is_blocked:
                     setattr(project, key, value)

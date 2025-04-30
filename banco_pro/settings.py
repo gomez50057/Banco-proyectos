@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.auth',
     'rest_framework',
     'banco_pro',
+    'formulario',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -165,6 +166,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Directorio de almacenamiento para los archivos multimedia
 MEDIA_ROOT = os.path.join(BASE_DIR, 'Documents')
+MEDIA_URL = '/Documents/'
 
 
 JAZZMIN_SETTINGS = {
