@@ -128,7 +128,7 @@ class FormProject(models.Model):
 
     tiempo_ejecucion = models.IntegerField(null=True, blank=True)
     isBlocked_tiempo_ejecucion = models.BooleanField(default=False)
-    observacion_tiempo_ejecucion = models.BooleanField(default=False)
+    observacion_tiempo_ejecucion = models.TextField(null=True, blank=True)
 
     modalidad_ejecucion = models.CharField(max_length=255)
     isBlocked_modalidad_ejecucion = models.BooleanField(default=False)
