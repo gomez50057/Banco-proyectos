@@ -214,6 +214,10 @@ class FormProject(models.Model):
     isBlocked_porcentaje_avance = models.BooleanField(default=False)
     observacion_porcentaje_avance = models.TextField(null=True, blank=True)
 
+    retroalimentacion = models.TextField(null=True, blank=True)
+    isBlocked_retroalimentacion = models.BooleanField(default=False)
+    observacion_retroalimentacion = models.TextField(null=True, blank=True)
+
     estatus = models.CharField(max_length=50, choices=[('Atendido', 'Atendido'), ('En Proceso', 'En Proceso'), ('Registrado', 'Registrado')], default='Registrado')
     isBlocked_estatus = models.BooleanField(default=False)
     observacion_estatus = models.TextField(null=True, blank=True)
@@ -222,19 +226,11 @@ class FormProject(models.Model):
     isBlocked_situacion = models.BooleanField(default=False)
     observacion_situacion = models.TextField(null=True, blank=True)
 
-    retroalimentacion = models.TextField(null=True, blank=True)
-    isBlocked_retroalimentacion = models.BooleanField(default=False)
-    observacion_retroalimentacion = models.TextField(null=True, blank=True)
-
 
     # Campos adicionales sin campo principal previo, agrupados en pareja
-    isBlocked_project = models.BooleanField(default=True)
+    isBlocked_project = models.BooleanField(default=True, verbose_name='¿Liberar Formulario?', help_text='Marca esta casilla para habilitar la edición al usuario en los campos permitidos.')
 
-    isBlocked_situacion_actual = models.BooleanField(default=False)
-    observacion_situacion_actual = models.TextField(null=True, blank=True)
-
-    isBlocked_expediente_tecnico = models.BooleanField(default=False)
-    observacion_expediente_tecnico = models.TextField(null=True, blank=True)
+    # Documentos
 
     isBlocked_estudios_factibilidad = models.BooleanField(default=False)
     observacion_estudios_factibilidad = models.TextField(null=True, blank=True)
@@ -274,7 +270,6 @@ class FormProject(models.Model):
 
 class Document(models.Model):
     DOCUMENT_TYPE_CHOICES = (
-        ('expediente_tecnico', 'Expediente Técnico'),
         ('estudios_factibilidad', 'Estudios de Factibilidad'),
         ('analisis_alternativas', 'Análisis de Alternativas'),
         ('validacion_normativa', 'Validación Normativa'),
