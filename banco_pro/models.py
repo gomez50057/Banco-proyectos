@@ -12,23 +12,43 @@ import os
 #     def __str__(self):
 #         return f"Historial de {self.project.nombre_proyecto} - {self.timestamp}"
 
+# def document_upload_to(instance, filename):
+#     """
+#     Construye la ruta de almacenamiento para un documento.
+#     Se intenta obtener el valor del campo 'project_id' (campo custom) del proyecto relacionado;
+#     si no está disponible, se usa 'unknown' como valor.
+#     Ya no se agrega "Documents" ya que esto esta hiendo definido en MEDIA_ROOT donde se establece
+#     Ruta: 'Documents/bancoProyectos/<project_custom_id>/<document_type>/<filename>'
+#     """
+#     try:
+#         # Intentamos obtener el campo custom 'project_id' del proyecto relacionado
+#         project_custom_id = instance.project.project_id
+#         if not project_custom_id:
+#             project_custom_id = 'unknown'
+#     except Exception:
+#         project_custom_id = 'unknown'
+#     return f"bancoProyectos/{project_custom_id}/{instance.document_type}/{filename}"
+
 def document_upload_to(instance, filename):
     """
     Construye la ruta de almacenamiento para un documento.
-    Se intenta obtener el valor del campo 'project_id' (campo custom) del proyecto relacionado;
-    si no está disponible, se usa 'unknown' como valor.
-    Ya no se agrega "Documents" ya que esto esta hiendo definido en MEDIA_ROOT donde se establece
-    Ruta: 'Documents/bancoProyectos/<project_custom_id>/<document_type>/<filename>'
+    - Si es un objeto nuevo (adding=True), lo guarda en:
+        MEDIA_ROOT/…/bancoProyectos/<project_id>/<document_type>/<filename>
+    - Si es una actualización (adding=False), lo guarda en:
+        MEDIA_ROOT/…/bancoProyectos/solvencia_<project_id>/<document_type>/<filename>
     """
     try:
-        # Intentamos obtener el campo custom 'project_id' del proyecto relacionado
-        project_custom_id = instance.project.project_id
-        if not project_custom_id:
-            project_custom_id = 'unknown'
+        project_custom_id = instance.project.project_id or 'unknown'
     except Exception:
         project_custom_id = 'unknown'
-    return f"bancoProyectos/{project_custom_id}/{instance.document_type}/{filename}"
 
+    # El prefijo cambia según si es creación o actualización
+    if instance._state.adding:
+        base_folder = f"bancoProyectos/{project_custom_id}"
+    else:
+        base_folder = f"bancoProyectos/solvencia_{project_custom_id}"
+
+    return f"{base_folder}/{instance.document_type}/{filename}"
 
 class FormProject(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='projects')

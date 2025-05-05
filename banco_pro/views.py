@@ -428,6 +428,8 @@ class UpdateProjectView(APIView):
       - Valida y actualiza el proyecto utilizando FormProjectSerializer de manera parcial.
       - Retorna los datos actualizados o errores de validación.
     """
+    parser_classes = [MultiPartParser, FormParser]
+
     def put(self, request, project_id):
         try:
             project = FormProject.objects.get(project_id=project_id)
@@ -435,10 +437,34 @@ class UpdateProjectView(APIView):
             return Response({"error": "Project not found"}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = FormProjectSerializer(project, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        project = serializer.save()
+        # … aquí va la parte de guardar archivos …
+
+         # Para cada campo de archivos que mandas desde el form:
+        for field_name in [
+            'estudios_factibilidad',
+            'analisis_alternativas',
+            'validacion_normativa',
+            'liberacion_derecho_via',
+            'analisis_costo_beneficio',
+            'proyecto_ejecutivo',
+            'manifestacion_impacto_ambiental',
+            'fotografia_render_proyecto',
+            'otros_estudios',
+        ]:
+            # request.FILES.getlist te devuelve la lista de File para ese key
+            for f in request.FILES.getlist(field_name):
+                Document.objects.create(
+                    project=project,
+                    document_type=field_name,
+                    file=f
+                )
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 # Django view para cerrar sesión
 from django.contrib.auth import logout
