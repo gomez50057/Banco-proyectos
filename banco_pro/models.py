@@ -32,21 +32,23 @@ import os
 def document_upload_to(instance, filename):
     """
     Construye la ruta de almacenamiento para un documento.
-    - Si es un objeto nuevo (adding=True), lo guarda en:
-        MEDIA_ROOT/…/bancoProyectos/<project_id>/<document_type>/<filename>
-    - Si es una actualización (adding=False), lo guarda en:
-        MEDIA_ROOT/…/bancoProyectos/solvencia_<project_id>/<document_type>/<filename>
+    - Si el proyecto NO tenía documentos previos, lo guarda en:
+        MEDIA_ROOT/bancoProyectos/<project_id>/<document_type>/<filename>
+    - Si YA tenía al menos 1 documento, lo guarda en:
+        MEDIA_ROOT/bancoProyectos/solvencia_<project_id>/<document_type>/<filename>
     """
-    try:
-        project_custom_id = instance.project.project_id or 'unknown'
-    except Exception:
-        project_custom_id = 'unknown'
+    project_custom_id = getattr(instance.project, 'project_id', 'unknown')
 
-    # El prefijo cambia según si es creación o actualización
-    if instance._state.adding:
-        base_folder = f"bancoProyectos/{project_custom_id}"
-    else:
+    # Si ya hay documentos para este proyecto (antes de guardar éste),
+    # es una "actualización" de documentos:
+    has_docs = Document.objects.filter(
+        project=instance.project
+    ).exists()
+
+    if has_docs:
         base_folder = f"bancoProyectos/solvencia_{project_custom_id}"
+    else:
+        base_folder = f"bancoProyectos/{project_custom_id}"
 
     return f"{base_folder}/{instance.document_type}/{filename}"
 
@@ -248,7 +250,7 @@ class FormProject(models.Model):
 
 
     # Campos adicionales sin campo principal previo, agrupados en pareja
-    isBlocked_project = models.BooleanField(default=True, verbose_name='¿Liberar Formulario?', help_text='Marca esta casilla para habilitar la edición al usuario en los campos permitidos.')
+    isBlocked_project = models.BooleanField(default=True, verbose_name='¿Liberar Formulario?', help_text='Desmarcar esta casilla para habilitar la edición al usuario en los campos permitidos.')
 
     # Documentos
 
