@@ -12,6 +12,7 @@ import os
 #     def __str__(self):
 #         return f"Historial de {self.project.nombre_proyecto} - {self.timestamp}"
 
+# Antrior
 # def document_upload_to(instance, filename):
 #     """
 #     Construye la ruta de almacenamiento para un documento.
@@ -254,32 +255,32 @@ class FormProject(models.Model):
 
     # Documentos
 
-    isBlocked_estudios_factibilidad = models.BooleanField(default=False)
-    observacion_estudios_factibilidad = models.TextField(null=True, blank=True)
+    # isBlocked_estudios_factibilidad = models.BooleanField(default=False)
+    # observacion_estudios_factibilidad = models.TextField(null=True, blank=True)
 
-    isBlocked_analisis_alternativas = models.BooleanField(default=False)
-    observacion_analisis_alternativas = models.TextField(null=True, blank=True)
+    # isBlocked_analisis_alternativas = models.BooleanField(default=False)
+    # observacion_analisis_alternativas = models.TextField(null=True, blank=True)
 
-    isBlocked_validacion_normativa = models.BooleanField(default=False)
-    observacion_validacion_normativa = models.TextField(null=True, blank=True)
+    # isBlocked_validacion_normativa = models.BooleanField(default=False)
+    # observacion_validacion_normativa = models.TextField(null=True, blank=True)
 
-    isBlocked_liberacion_derecho_via = models.BooleanField(default=False)
-    observacion_liberacion_derecho_via = models.TextField(null=True, blank=True)
+    # isBlocked_liberacion_derecho_via = models.BooleanField(default=False)
+    # observacion_liberacion_derecho_via = models.TextField(null=True, blank=True)
 
-    isBlocked_analisis_costo_beneficio = models.BooleanField(default=False)
-    observacion_analisis_costo_beneficio = models.TextField(null=True, blank=True)
+    # isBlocked_analisis_costo_beneficio = models.BooleanField(default=False)
+    # observacion_analisis_costo_beneficio = models.TextField(null=True, blank=True)
 
-    isBlocked_proyecto_ejecutivo = models.BooleanField(default=False)
-    observacion_proyecto_ejecutivo = models.TextField(null=True, blank=True)
+    # isBlocked_proyecto_ejecutivo = models.BooleanField(default=False)
+    # observacion_proyecto_ejecutivo = models.TextField(null=True, blank=True)
 
-    isBlocked_manifestacion_impacto_ambiental = models.BooleanField(default=False)
-    observacion_manifestacion_impacto_ambiental = models.TextField(null=True, blank=True)
+    # isBlocked_manifestacion_impacto_ambiental = models.BooleanField(default=False)
+    # observacion_manifestacion_impacto_ambiental = models.TextField(null=True, blank=True)
 
-    isBlocked_render = models.BooleanField(default=False)
-    observacion_render = models.TextField(null=True, blank=True)
+    # isBlocked_render = models.BooleanField(default=False)
+    # observacion_render = models.TextField(null=True, blank=True)
 
-    isBlocked_otros_estudios = models.BooleanField(default=False)
-    observacion_otros_estudios = models.TextField(null=True, blank=True)
+    # isBlocked_otros_estudios = models.BooleanField(default=False)
+    # observacion_otros_estudios = models.TextField(null=True, blank=True)
 
 
     # # Campos para auditoría
@@ -312,8 +313,9 @@ class Document(models.Model):
         return f"{self.project.project_id} - {self.document_type}"
 
 
-
-
+# -----------------
+# Cedula de registro ejercicio 2025
+# -----------------
 
 def custom_upload_to(instance, filename):
     # Obtener el ID del proyecto y el tipo de anexo

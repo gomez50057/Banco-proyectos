@@ -441,9 +441,7 @@ class UpdateProjectView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         project = serializer.save()
-        # … aquí va la parte de guardar archivos …
-
-         # Para cada campo de archivos que mandas desde el form:
+         # Para cada campo de archivos que se manda desde el form:
         for field_name in [
             'estudios_factibilidad',
             'analisis_alternativas',
@@ -455,7 +453,6 @@ class UpdateProjectView(APIView):
             'fotografia_render_proyecto',
             'otros_estudios',
         ]:
-            # request.FILES.getlist te devuelve la lista de File para ese key
             for f in request.FILES.getlist(field_name):
                 Document.objects.create(
                     project=project,
