@@ -28,7 +28,7 @@ class DocumentInlineForm(forms.ModelForm):
         labels = {
             'document_type': 'Tipo de documento',
             'file': 'Ruta del archivo',
-            'uploaded_at': 'Subido en',
+            'uploaded_at': 'Subido el',
         }
 
 class DocumentInline(admin.TabularInline):
@@ -48,20 +48,59 @@ class DocumentInline(admin.TabularInline):
     file_preview.short_description = "Archivo"
 
 class FormProjectAdmin(admin.ModelAdmin):
+    inlines = [DocumentInline]
     list_display = (
         'project_id','user', 'nombre_proyecto', 'sector', 'tipo_proyecto', 'tipo_entidad',
-        'dependencia', 'organismo', 'municipio_ayuntamiento', 'fecha_registro', 
+        'dependencia', 'organismo', 'municipio_ayuntamiento', 'fecha_registro',
     )
 
     list_filter = ('user__username', 'sector', 'tipo_proyecto', 'tipo_entidad', 'dependencia', 'organismo', 'municipio_ayuntamiento', 'fecha_registro')
 
     search_fields = ('nombre_proyecto', 'project_id',)
-    inlines = [DocumentInline]
 
+    readonly_fields = ('fecha_registro',)
 
+    def get_fields(self, request, obj=None):
+        # Recojo solo los campos editables, columna directa y que NO sean PK,
+        #    ni observaciones ni isBlocked.
+        base_fields = []
+        for f in self.model._meta.get_fields():
+            # descartamos relaciones M2M/M2O
+            if not getattr(f, 'column', None):
+                continue
+            # descartamos PK y no editables
+            if f.primary_key or not f.editable:
+                continue
+            # descartamos observaciones y banderas
+            if f.name.startswith('observacion_') or f.name.startswith('isBlocked_'):
+                continue
+            base_fields.append(f.name)
+
+        # Emparejo cada campo con su isBlocked_ si existe
+        fields = []
+        # saco de nuevo todos los nombres para poder comprobar existencia
+        all_names = [f.name for f in self.model._meta.get_fields()]
+        for name in base_fields:
+            paired = f'isBlocked_{name}'
+            if paired in all_names:
+                fields.append((name, paired))
+            else:
+                fields.append(name)
+
+        # Añado “a mano” cualquier bandera que no emparejó
+        if 'isBlocked_project' in all_names:
+            fields.append('isBlocked_project')
+
+        # Finalmente los campos read‐only
+        fields.append('fecha_registro')
+        return fields
 
     def formfield_for_dbfield(self, db_field, **kwargs):
         formfield = super().formfield_for_dbfield(db_field, **kwargs)
+        # 1) Si es isBlocked_XXX, quitamos el texto del label excepto isBlocked_project
+        if db_field.name.startswith('isBlocked_') and db_field.name != 'isBlocked_project':
+            formfield.label = ''
+        # 2) Si es uno de los campos de list_display, aplicamos tu clase CSS
         if db_field.name in self.list_display:
             formfield.widget.attrs.update({'class': 'field-name'})
         return formfield
